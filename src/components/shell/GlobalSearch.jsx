@@ -44,7 +44,7 @@ function getResultKey(result, index) {
  * @returns {JSX.Element}
  */
 function GlobalSearch({
-  personaId,
+  personaId = '',
   value,
   query,
   onChange,
@@ -52,13 +52,13 @@ function GlobalSearch({
   onSelect,
   onResultSelect,
   domains,
-  placeholder,
-  searchLabel,
-  noResultsLabel,
-  maxResults,
-  showResults,
-  className,
-  inputClassName,
+  placeholder = 'Search accounts, products, and offers',
+  searchLabel = 'Search accounts, products, and offers',
+  noResultsLabel = 'No matching results found.',
+  maxResults = 8,
+  showResults = true,
+  className = '',
+  inputClassName = '',
 }) {
   const navigate = useNavigate();
   const containerRef = useRef(null);
@@ -260,24 +260,6 @@ GlobalSearch.propTypes = {
   showResults: PropTypes.bool,
   className: PropTypes.string,
   inputClassName: PropTypes.string,
-};
-
-GlobalSearch.defaultProps = {
-  personaId: '',
-  value: undefined,
-  query: undefined,
-  onChange: undefined,
-  onQueryChange: undefined,
-  onSelect: undefined,
-  onResultSelect: undefined,
-  domains: undefined,
-  placeholder: 'Search accounts, products, and offers',
-  searchLabel: 'Search accounts, products, and offers',
-  noResultsLabel: 'No matching results found.',
-  maxResults: 8,
-  showResults: true,
-  className: '',
-  inputClassName: '',
 };
 
 export { GlobalSearch };

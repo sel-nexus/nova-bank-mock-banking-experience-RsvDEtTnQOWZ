@@ -1,16 +1,18 @@
 import React from 'react';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter, useLocation } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { LoginPage } from './LoginPage.jsx';
+import { ProtectedRoute } from '../routes/ProtectedRoute.jsx';
 import { ROUTES } from '../config/constants.js';
 import authService from '../services/authService.js';
 import sessionManager from '../services/sessionManager.js';
 import storageService from '../services/storageService.js';
+import { AppProvider } from '../state/AppProvider.jsx';
 
 const VALID_USER_ID = 'user-miguel-santos';
-const VALID_PASSWORD = 'NovaDemo123!';
+const VALID_PASSWORD = 'demo-only';
 
 function LocationProbe() {
   const location = useLocation();
@@ -25,10 +27,12 @@ function LocationProbe() {
 
 function renderLogin(initialEntries = [ROUTES.login]) {
   return render(
-    <MemoryRouter initialEntries={initialEntries}>
-      <LoginPage />
-      <LocationProbe />
-    </MemoryRouter>,
+    <AppProvider>
+      <MemoryRouter initialEntries={initialEntries}>
+        <LoginPage />
+        <LocationProbe />
+      </MemoryRouter>
+    </AppProvider>,
   );
 }
 
@@ -147,6 +151,36 @@ describe('LoginPage', () => {
       );
     });
     expect(authService.isAuthenticated()).toBe(true);
+  });
+
+  it('keeps the signed-in session when a protected route is opened', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <AppProvider>
+        <MemoryRouter initialEntries={[ROUTES.login]}>
+          <Routes>
+            <Route path={ROUTES.login} element={<LoginPage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route
+                path={ROUTES.dashboard}
+                element={<h1>Portfolio</h1>}
+              />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AppProvider>,
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: /Miguel Santos/ }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Sign in' }));
+
+    expect(
+      await screen.findByRole('heading', { name: 'Portfolio' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Access your demo' })).not.toBeInTheDocument();
   });
 
   it('locks the demo account after five unsuccessful sign-in attempts', async () => {

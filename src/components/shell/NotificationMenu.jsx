@@ -57,8 +57,8 @@ function getUnreadCount(notifications) {
  * @returns {JSX.Element}
  */
 function NotificationMenu({
-  personaId,
-  userId,
+  personaId = '',
+  userId = '',
   persona,
   notifications: providedNotifications,
   notificationCount,
@@ -70,7 +70,7 @@ function NotificationMenu({
   onSelect,
   onMarkAllRead,
   onClose,
-  className,
+  className = '',
 }) {
   const navigate = useNavigate();
   const containerRef = useRef(null);
@@ -349,23 +349,6 @@ NotificationMenu.propTypes = {
   onMarkAllRead: PropTypes.func,
   onClose: PropTypes.func,
   className: PropTypes.string,
-};
-
-NotificationMenu.defaultProps = {
-  personaId: '',
-  userId: '',
-  persona: undefined,
-  notifications: undefined,
-  notificationCount: undefined,
-  unreadNotificationCount: undefined,
-  open: undefined,
-  isOpen: undefined,
-  onOpenChange: undefined,
-  onNotificationClick: undefined,
-  onSelect: undefined,
-  onMarkAllRead: undefined,
-  onClose: undefined,
-  className: '',
 };
 
 export { NotificationMenu };

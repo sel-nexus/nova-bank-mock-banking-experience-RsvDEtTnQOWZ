@@ -177,11 +177,8 @@ describe('SessionManager', () => {
     setTime(200);
     const activitySnapshot = manager.recordActivity('click');
 
-    expect(activitySnapshot.status).toBe('cleared');
-    expect(activitySnapshot.isCleared).toBe(true);
-    expect(activitySnapshot.lastActivityAt).toBe(
-      clearedSnapshot.lastActivityAt,
-    );
+    expect(activitySnapshot).toBeNull();
+    expect(manager.getSnapshot().status).toBe('cleared');
   });
 
   it('returns null when clearing a manager that has no session', () => {

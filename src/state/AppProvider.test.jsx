@@ -11,7 +11,7 @@ import sessionManager from '../services/sessionManager.js';
 import storageService from '../services/storageService.js';
 
 const VALID_USER_ID = 'user-miguel-santos';
-const VALID_PASSWORD = 'NovaDemo123!';
+const VALID_PASSWORD = 'demo-only';
 const SECOND_PERSONA_ID = 'user-rosa-delacruz';
 
 function createDeferred() {

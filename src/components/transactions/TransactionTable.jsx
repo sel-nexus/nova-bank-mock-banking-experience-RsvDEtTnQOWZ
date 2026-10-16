@@ -81,13 +81,13 @@ function TransactionTable({
   items,
   rows,
   expandedTransactionIds,
-  defaultExpandedIds,
+  defaultExpandedIds = [],
   onExpand,
   onSelect,
   onTransactionClick,
-  className,
-  emptyTitle,
-  emptyDescription,
+  className = '',
+  emptyTitle = 'No transactions available',
+  emptyDescription = 'There is no transaction activity to display right now.',
 }) {
   const transactionItems = Array.isArray(transactions)
     ? transactions
@@ -161,7 +161,7 @@ function TransactionTable({
       data-testid="transaction-table"
     >
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[ fiftyrem] border-collapse text-left">
+        <table className="w-full min-w-[42rem] border-collapse text-left">
           <caption className="sr-only">
             Transaction activity with expandable details
           </caption>
@@ -385,21 +385,6 @@ TransactionTable.propTypes = {
   className: PropTypes.string,
   emptyTitle: PropTypes.string,
   emptyDescription: PropTypes.string,
-};
-
-TransactionTable.defaultProps = {
-  transactions: undefined,
-  items: undefined,
-  rows: undefined,
-  expandedTransactionIds: undefined,
-  defaultExpandedIds: [],
-  onExpand: undefined,
-  onSelect: undefined,
-  onTransactionClick: undefined,
-  className: '',
-  emptyTitle: 'No transactions available',
-  emptyDescription:
-    'There is no transaction activity to display right now.',
 };
 
 export { TransactionTable };

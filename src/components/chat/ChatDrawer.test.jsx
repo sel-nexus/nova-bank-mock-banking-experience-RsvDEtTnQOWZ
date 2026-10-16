@@ -94,10 +94,12 @@ describe('ChatDrawer', () => {
     await user.click(screen.getByRole('button', { name: 'Accounts' }));
 
     expect(
-      await screen.findByText(
-        'I can help with your Nova Bank Demo accounts. You can review balances, account details, and masked account numbers from the Accounts area.',
-      ),
-    ).toBeInTheDocument();
+      (
+        await screen.findAllByText(
+          'I can help with your Nova Bank Demo accounts. You can review balances, account details, and masked account numbers from the Accounts area.',
+        )
+      ).length,
+    ).toBeGreaterThan(0);
     expect(screen.getByText(/Welcome, Miguel\./)).toBeInTheDocument();
   });
 

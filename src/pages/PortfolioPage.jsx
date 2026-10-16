@@ -57,7 +57,7 @@ function getOfferValue(offer) {
  * }} props
  * @returns {JSX.Element}
  */
-function PortfolioPage({ personaId: providedPersonaId, className }) {
+function PortfolioPage({ personaId: providedPersonaId = '', className = '' }) {
   const { persona, session } = useAppContext();
 
   const activePersonaId = getPersonaId(
@@ -114,7 +114,7 @@ function PortfolioPage({ personaId: providedPersonaId, className }) {
             Your portfolio
           </p>
           <h1 className="mt-2 text-3xl font-bold text-nova-midnight sm:text-4xl">
-            Welcome back, {displayName}
+            {portfolioPersona?.greeting || `Magandang umaga, ${displayName}`}
           </h1>
           <p className="mt-2 max-w-2xl text-base text-nova-slate">
             Here is a clear view of your synthetic banking relationship.
@@ -123,7 +123,7 @@ function PortfolioPage({ personaId: providedPersonaId, className }) {
 
         <NavLink
           to={ROUTES.transactions}
-          className="hidden min-h-11 shrink-0 items-center rounded-lg border border-nova-navy px-4 py-2 text-sm font-semibold text-nova-navy transition hover:bg-nova-sky focus:outline-none focus:ring-4 focus:ring-nova-blue/20 sm:inline-flex"
+          className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-nova-navy px-4 py-2 text-sm font-semibold text-nova-navy transition hover:bg-nova-sky focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
         >
           View activity
         </NavLink>
@@ -131,11 +131,11 @@ function PortfolioPage({ personaId: providedPersonaId, className }) {
 
       <section
         aria-labelledby="relationship-balance-title"
-        className="mb-8 rounded-card bg-nova-midnight p-6 text-white shadow-elevated sm:p-8"
+        className="mb-8 rounded-card bg-nova-navy p-6 text-white shadow-elevated sm:p-8"
       >
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-nova-lime">
+            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#FEF4C8]">
               Total relationship balance
             </p>
             <h2
@@ -144,23 +144,20 @@ function PortfolioPage({ personaId: providedPersonaId, className }) {
             >
               {summary.totalBalanceDisplay}
             </h2>
-            <p className="mt-3 text-sm text-nova-sky">
-              Available balance:{' '}
-              <span className="font-semibold text-white">
-                {summary.totalAvailableBalanceDisplay}
-              </span>
+            <p className="mt-3 text-sm text-white/85">
+              Sum of available deposit balances.
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4 text-sm sm:min-w-64">
             <div className="rounded-lg bg-white/10 p-4">
-              <p className="text-nova-sky">Accounts</p>
+              <p className="text-white/80">Accounts</p>
               <p className="mt-1 text-2xl font-bold text-white">
                 {summary.accountCount}
               </p>
             </div>
             <div className="rounded-lg bg-white/10 p-4">
-              <p className="text-nova-sky">Pending activity</p>
+              <p className="text-white/80">Pending activity</p>
               <p className="mt-1 text-2xl font-bold text-white">
                 {summary.pendingTransactionCount}
               </p>
@@ -192,7 +189,7 @@ function PortfolioPage({ personaId: providedPersonaId, className }) {
         </div>
 
         {accounts.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {accounts.map((account) => (
               <NavLink
                 key={account.id}
@@ -257,7 +254,7 @@ function PortfolioPage({ personaId: providedPersonaId, className }) {
         >
           Quick links
         </h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-4 flex flex-wrap gap-3">
           {[
             {
               label: 'Transfer money',
@@ -287,7 +284,7 @@ function PortfolioPage({ personaId: providedPersonaId, className }) {
             <NavLink
               key={link.route}
               to={link.route}
-              className="surface-card flex items-start gap-3 p-4 transition hover:border-nova-blue/40 hover:bg-nova-sky/30 focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
+              className="surface-card flex w-full min-w-[14rem] flex-1 items-start gap-3 p-4 transition hover:border-nova-navy/40 hover:bg-nova-sky/40 focus:outline-none focus:ring-4 focus:ring-nova-blue/20 sm:w-auto"
             >
               <span
                 aria-hidden="true"
@@ -308,7 +305,7 @@ function PortfolioPage({ personaId: providedPersonaId, className }) {
         </div>
       </section>
 
-      <div className="grid gap-8 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <section aria-labelledby="recommendations-title">
           <div className="mb-4 flex items-center justify-between gap-4">
             <div>
@@ -492,11 +489,9 @@ function PortfolioPage({ personaId: providedPersonaId, className }) {
         <p>
           Last login:{' '}
           <span className="font-semibold text-nova-ink">
-            {lastLogin ? formatDateTime(lastLogin) : 'Not available'}
+            {portfolioPersona?.lastLoginLabel ||
+              (lastLogin ? formatDateTime(lastLogin) : 'Not available')}
           </span>
-        </p>
-        <p className="text-xs">
-          All balances and activity shown are synthetic demo data.
         </p>
       </div>
     </div>
@@ -506,11 +501,6 @@ function PortfolioPage({ personaId: providedPersonaId, className }) {
 PortfolioPage.propTypes = {
   personaId: PropTypes.string,
   className: PropTypes.string,
-};
-
-PortfolioPage.defaultProps = {
-  personaId: '',
-  className: '',
 };
 
 export { PortfolioPage };

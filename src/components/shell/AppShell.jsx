@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Drawer } from '../shared/Drawer.jsx';
-import { PrivacyBanner } from '../shared/PrivacyBanner.jsx';
 import { SessionWarning } from './SessionWarning.jsx';
 import { Header } from './Header.jsx';
 import { ToastProvider } from '../shared/ToastProvider.jsx';
@@ -164,11 +163,9 @@ ChatDrawer.propTypes = {};
 
 function AppShell({
   children,
-  className,
-  mainClassName,
-  headerProps,
-  privacyBannerProps,
-  showPrivacyBanner,
+  className = '',
+  mainClassName = '',
+  headerProps = {},
 }) {
   const { openChat } = useChatContext();
 
@@ -184,8 +181,6 @@ function AppShell({
             onOpenChat={openChat}
           />
 
-          {showPrivacyBanner && <PrivacyBanner {...privacyBannerProps} />}
-
           <main
             id="main-content"
             className={[
@@ -197,6 +192,14 @@ function AppShell({
           >
             {children}
           </main>
+
+          <footer className="mt-auto border-t-4 border-[#DCB91C] bg-white">
+            <div className="mx-auto flex w-full max-w-[1280px] px-4 py-4 sm:px-6 lg:px-8">
+              <p className="font-extrabold tracking-[0.14em] text-nova-navy">
+                NOVA BANK
+              </p>
+            </div>
+          </footer>
         </div>
 
         <SessionWarning />
@@ -211,16 +214,6 @@ AppShell.propTypes = {
   className: PropTypes.string,
   mainClassName: PropTypes.string,
   headerProps: PropTypes.object,
-  privacyBannerProps: PropTypes.object,
-  showPrivacyBanner: PropTypes.bool,
-};
-
-AppShell.defaultProps = {
-  className: '',
-  mainClassName: '',
-  headerProps: {},
-  privacyBannerProps: {},
-  showPrivacyBanner: true,
 };
 
 export { AppShell, ChatDrawer };

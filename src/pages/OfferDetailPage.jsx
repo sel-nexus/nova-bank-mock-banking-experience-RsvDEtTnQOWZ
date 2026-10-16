@@ -114,12 +114,12 @@ function getEligibilityMessage(offer, eligible) {
  * @returns {JSX.Element}
  */
 function OfferDetailPage({
-  offerId: providedOfferId,
-  personaId: providedPersonaId,
+  offerId: providedOfferId = '',
+  personaId: providedPersonaId = '',
   offer: providedOffer,
   onExpressInterest,
   onApply,
-  className,
+  className = '',
 }) {
   const navigate = useNavigate();
   const { offerId: routeOfferId } = useParams();
@@ -269,11 +269,11 @@ function OfferDetailPage({
 
       <section
         aria-labelledby="offer-overview-title"
-        className="mb-8 overflow-hidden rounded-card bg-nova-midnight p-6 text-white shadow-elevated sm:p-8"
+        className="mb-8 overflow-hidden rounded-card bg-nova-navy p-6 text-white shadow-elevated sm:p-8"
       >
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-nova-lime">
+            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#FEF4C8]">
               Offer overview
             </p>
             <h2
@@ -291,7 +291,7 @@ function OfferDetailPage({
           )}
         </div>
 
-        <p className="mt-6 max-w-3xl text-base leading-7 text-nova-sky">
+        <p className="mt-6 max-w-3xl text-base leading-7 text-white/90">
           {safeDisplay(
             offer.description,
             'Offer details are not available for this synthetic offer.',
@@ -451,20 +451,6 @@ function OfferDetailPage({
               Express interest
             </button>
           </section>
-
-          <section
-            aria-label="Synthetic offer disclaimer"
-            className="rounded-lg bg-nova-sky/70 px-4 py-4 text-sm text-nova-slate"
-          >
-            <p className="font-semibold text-nova-midnight">
-              Synthetic offer information
-            </p>
-            <p className="mt-2 leading-6">
-              This offer, its value, eligibility, terms, and availability are
-              simulated for demonstration purposes. No real financial product
-              is opened or requested.
-            </p>
-          </section>
         </aside>
       </div>
     </div>
@@ -478,15 +464,6 @@ OfferDetailPage.propTypes = {
   onExpressInterest: PropTypes.func,
   onApply: PropTypes.func,
   className: PropTypes.string,
-};
-
-OfferDetailPage.defaultProps = {
-  offerId: '',
-  personaId: '',
-  offer: undefined,
-  onExpressInterest: undefined,
-  onApply: undefined,
-  className: '',
 };
 
 export { OfferDetailPage };

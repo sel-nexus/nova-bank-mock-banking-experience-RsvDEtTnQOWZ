@@ -5,18 +5,18 @@ export default {
     extend: {
       colors: {
         nova: {
-          midnight: '#0B1F33',
-          navy: '#123B5D',
-          blue: '#1E5B8C',
-          teal: '#0E7490',
-          sky: '#DCEFF7',
-          mint: '#D8F3EC',
-          lime: '#B8E986',
-          gold: '#F4C95D',
-          coral: '#F28C7B',
-          cream: '#F7F5EF',
-          ink: '#102A43',
-          slate: '#627D98',
+          midnight: '#1A1A1A',
+          navy: '#B11116',
+          blue: '#8E0E12',
+          teal: '#18794E',
+          sky: '#FFEDED',
+          mint: '#E7F8EA',
+          lime: '#DCB91C',
+          gold: '#DCB91C',
+          coral: '#EE4F53',
+          cream: '#F5F5F5',
+          ink: '#1A1A1A',
+          slate: '#5D5D5D',
         },
       },
       fontFamily: {
@@ -24,8 +24,8 @@ export default {
         display: ['Manrope', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        card: '0 12px 32px rgba(11, 31, 51, 0.08)',
-        elevated: '0 20px 48px rgba(11, 31, 51, 0.14)',
+        card: '0 8px 24px rgba(26, 26, 26, 0.08)',
+        elevated: '0 16px 40px rgba(177, 17, 22, 0.12)',
       },
       borderRadius: {
         card: '1rem',

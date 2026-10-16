@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function PrivacyNotice({ className, compact }) {
+function PrivacyNotice({ className = '', compact = false }) {
   return (
     <aside
       role="note"
@@ -40,11 +40,6 @@ function PrivacyNotice({ className, compact }) {
 PrivacyNotice.propTypes = {
   className: PropTypes.string,
   compact: PropTypes.bool,
-};
-
-PrivacyNotice.defaultProps = {
-  className: '',
-  compact: false,
 };
 
 export { PrivacyNotice };

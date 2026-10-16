@@ -122,14 +122,14 @@ function BranchDirectory({
   branches,
   locations,
   search,
-  initialSearch,
+  initialSearch = '',
   onBranchSelect,
   onSelect,
-  className,
-  title,
-  description,
-  showSearch,
-  showAtmDetails,
+  className = '',
+  title = 'Branch directory',
+  description = 'Explore synthetic branch and ATM locations available in this demonstration.',
+  showSearch = true,
+  showAtmDetails = true,
 }) {
   const [localSearch, setLocalSearch] = useState(initialSearch);
   const [expandedBranchId, setExpandedBranchId] = useState(null);
@@ -391,21 +391,6 @@ BranchDirectory.propTypes = {
   description: PropTypes.node,
   showSearch: PropTypes.bool,
   showAtmDetails: PropTypes.bool,
-};
-
-BranchDirectory.defaultProps = {
-  branches: undefined,
-  locations: undefined,
-  search: undefined,
-  initialSearch: '',
-  onBranchSelect: undefined,
-  onSelect: undefined,
-  className: '',
-  title: 'Branch directory',
-  description:
-    'Explore synthetic branch and ATM locations available in this demonstration.',
-  showSearch: true,
-  showAtmDetails: true,
 };
 
 export { BranchDirectory };

@@ -26,33 +26,29 @@ describe('transactionSelectors', () => {
     );
 
     expect(getTransactionIds(transactions)).toEqual([
-      'transaction-miguel-market',
-      'transaction-miguel-transfer',
-      'transaction-miguel-savings-transfer',
+      'transaction-savings-supermarket',
+      'transaction-savings-goal',
     ]);
   });
 
   it('filters fixture transactions by merchant, description, and reference search text', () => {
     expect(
       getTransactionIds(
-        selectTransactionsBySearch(fixtureTransactions, 'greenway'),
+        selectTransactionsBySearch(fixtureTransactions, 'manila supermarket'),
       ),
-    ).toEqual(['transaction-miguel-market']);
+    ).toEqual(['transaction-savings-supermarket']);
 
     expect(
       getTransactionIds(
-        selectTransactionsBySearch(fixtureTransactions, 'CARD-9918'),
+        selectTransactionsBySearch(fixtureTransactions, 'REF-TX-882194'),
       ),
-    ).toEqual(['transaction-miguel-streaming']);
+    ).toEqual(['transaction-savings-coffee']);
 
     expect(
       getTransactionIds(
         selectTransactionsBySearch(fixtureTransactions, 'payroll'),
       ),
-    ).toEqual([
-      'transaction-miguel-payroll',
-      'transaction-rosa-payroll',
-    ]);
+    ).toEqual(['transaction-payroll-credit']);
   });
 
   it('filters fixture transactions by type and category', () => {
@@ -64,36 +60,33 @@ describe('transactionSelectors', () => {
         }),
       ),
     ).toEqual([
-      'transaction-miguel-market',
-      'transaction-miguel-coffee',
-      'transaction-miguel-streaming',
+      'transaction-savings-supermarket',
+      'transaction-savings-coffee',
+      'transaction-savings-transit',
+      'transaction-card-declined',
     ]);
 
     expect(
-      getTransactionIds(selectTransactionsByCategory(fixtureTransactions, 'food')),
-    ).toEqual([
-      'transaction-miguel-market',
-      'transaction-miguel-coffee',
-    ]);
+      getTransactionIds(selectTransactionsByCategory(fixtureTransactions, 'groceries')),
+    ).toEqual(['transaction-savings-supermarket']);
 
     expect(
       getTransactionIds(
         selectTransactions(fixtureTransactions, {
-          category: 'entertainment',
+          category: 'dining',
           includeFuture: true,
         }),
       ),
-    ).toEqual(['transaction-miguel-streaming']);
+    ).toEqual(['transaction-savings-coffee']);
   });
 
   it('filters fixture transactions by direction and supports merchant-category matching', () => {
     expect(
       getTransactionIds(selectTransactionsByDirection(fixtureTransactions, 'credit')),
     ).toEqual([
-      'transaction-miguel-payroll',
-      'transaction-miguel-savings-transfer',
-      'transaction-miguel-interest',
-      'transaction-rosa-payroll',
+      'transaction-savings-salary',
+      'transaction-payroll-credit',
+      'transaction-rosa-salary',
     ]);
 
     expect(
@@ -103,7 +96,7 @@ describe('transactionSelectors', () => {
           includeFuture: true,
         }),
       ),
-    ).toEqual(['transaction-miguel-market']);
+    ).toEqual(['transaction-savings-supermarket']);
   });
 
   it('sorts the six dated fixture transactions in ascending and descending order', () => {
@@ -117,12 +110,12 @@ describe('transactionSelectors', () => {
         }),
       ),
     ).toEqual([
-      'transaction-miguel-transfer',
-      'transaction-miguel-savings-transfer',
-      'transaction-miguel-market',
-      'transaction-miguel-coffee',
-      'transaction-miguel-rent',
-      'transaction-miguel-payroll',
+      'transaction-savings-transit',
+      'transaction-card-declined',
+      'transaction-savings-coffee',
+      'transaction-savings-goal',
+      'transaction-savings-supermarket',
+      'transaction-savings-salary',
     ]);
 
     expect(
@@ -133,12 +126,12 @@ describe('transactionSelectors', () => {
         }),
       ),
     ).toEqual([
-      'transaction-miguel-payroll',
-      'transaction-miguel-rent',
-      'transaction-miguel-coffee',
-      'transaction-miguel-market',
-      'transaction-miguel-transfer',
-      'transaction-miguel-savings-transfer',
+      'transaction-savings-salary',
+      'transaction-savings-supermarket',
+      'transaction-savings-goal',
+      'transaction-savings-coffee',
+      'transaction-card-declined',
+      'transaction-savings-transit',
     ]);
   });
 
@@ -152,19 +145,19 @@ describe('transactionSelectors', () => {
     });
 
     expect(getTransactionIds(sortedTransactions)).toEqual([
-      'transaction-miguel-payroll',
-      'transaction-miguel-rent',
-      'transaction-miguel-transfer',
-      'transaction-miguel-savings-transfer',
-      'transaction-miguel-market',
-      'transaction-miguel-coffee',
+      'transaction-savings-salary',
+      'transaction-savings-goal',
+      'transaction-savings-supermarket',
+      'transaction-savings-transit',
+      'transaction-savings-coffee',
+      'transaction-card-declined',
     ]);
     expect(getTransactionIds(sourceTransactions)).toEqual(originalIds);
   });
 
   it('combines fixture filtering and sorting for a transaction enquiry', () => {
     const transactions = selectAndSortTransactions(fixtureTransactions, {
-      search: 'card',
+      search: 'REF-TX-88219',
       type: 'card',
       sortBy: 'amount',
       sortOrder: 'asc',
@@ -172,9 +165,10 @@ describe('transactionSelectors', () => {
     });
 
     expect(getTransactionIds(transactions)).toEqual([
-      'transaction-miguel-coffee',
-      'transaction-miguel-market',
-      'transaction-miguel-streaming',
+      'transaction-card-declined',
+      'transaction-savings-coffee',
+      'transaction-savings-transit',
+      'transaction-savings-supermarket',
     ]);
   });
 

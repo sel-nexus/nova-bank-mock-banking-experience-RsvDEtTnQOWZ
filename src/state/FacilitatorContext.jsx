@@ -7,6 +7,7 @@ import React, {
 import PropTypes from 'prop-types';
 import { FIXTURES } from '../fixtures/fixtures.js';
 import { APP_ACTION_TYPES } from './appReducer.js';
+import { appSelectors } from './appSelectors.js';
 import { useAppContext } from './AppProvider.jsx';
 import resilienceService from '../services/resilienceService.js';
 import sessionManager from '../services/sessionManager.js';
@@ -73,7 +74,7 @@ function getPersona(personaOrId) {
  * @returns {JSX.Element}
  */
 export function FacilitatorProvider({ children }) {
-  const { state, dispatch, actions, appSelectors } = useAppContext();
+  const { state, dispatch, actions } = useAppContext();
   const facilitator = state.facilitator || {};
   const persona = state.persona || null;
 
@@ -231,7 +232,6 @@ export function FacilitatorProvider({ children }) {
       resetDemo,
     }),
     [
-      appSelectors,
       facilitator,
       persona,
       state,
@@ -282,6 +282,15 @@ export function useFacilitatorContext() {
  */
 export function useFacilitator() {
   return useFacilitatorContext();
+}
+
+/**
+ * Returns facilitator controls when the provider is mounted.
+ *
+ * @returns {Object|null}
+ */
+export function useOptionalFacilitator() {
+  return useContext(FacilitatorContext);
 }
 
 export default FacilitatorProvider;

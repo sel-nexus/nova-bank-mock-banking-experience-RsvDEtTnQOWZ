@@ -35,7 +35,7 @@ describe('ContactPage', () => {
     expect(screen.getByLabelText('Subject')).toBeInTheDocument();
     expect(screen.getByLabelText('Message')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Send enquiry' }),
+      screen.getByRole('button', { name: 'Send Message (Simulated)' }),
     ).toBeInTheDocument();
   });
 
@@ -44,7 +44,7 @@ describe('ContactPage', () => {
 
     renderContact();
 
-    await user.click(screen.getByRole('button', { name: 'Send enquiry' }));
+    await user.click(screen.getByRole('button', { name: 'Send Message (Simulated)' }));
 
     expect(screen.getByRole('alert')).toBeInTheDocument();
     expect(screen.getByText('Select a topic.')).toBeInTheDocument();
@@ -73,7 +73,7 @@ describe('ContactPage', () => {
     await user.selectOptions(screen.getByLabelText('Topic'), 'accounts');
     await user.type(screen.getByLabelText('Subject'), 'Account question');
     await user.type(screen.getByLabelText('Message'), 'Too short');
-    await user.click(screen.getByRole('button', { name: 'Send enquiry' }));
+    await user.click(screen.getByRole('button', { name: 'Send Message (Simulated)' }));
 
     expect(screen.getByText('Message must be at least 10 characters.')).toBeInTheDocument();
     expect(screen.getByLabelText('Message')).toHaveAttribute(
@@ -81,7 +81,7 @@ describe('ContactPage', () => {
       'true',
     );
     expect(
-      screen.getByRole('button', { name: 'Send enquiry' }),
+      screen.getByRole('button', { name: 'Send Message (Simulated)' }),
     ).toBeInTheDocument();
     expect(supportService.getContactEnquiries()).toEqual([]);
   });
@@ -103,7 +103,7 @@ describe('ContactPage', () => {
       screen.getByLabelText('Message'),
       'Please explain this synthetic transaction.',
     );
-    await user.click(screen.getByRole('button', { name: 'Send enquiry' }));
+    await user.click(screen.getByRole('button', { name: 'Send Message (Simulated)' }));
 
     expect(
       screen.getByRole('heading', { name: 'Your enquiry was received' }),
@@ -146,7 +146,7 @@ describe('ContactPage', () => {
       screen.getByLabelText('Message'),
       'How is this synthetic information handled?',
     );
-    await user.click(screen.getByRole('button', { name: 'Send enquiry' }));
+    await user.click(screen.getByRole('button', { name: 'Send Message (Simulated)' }));
 
     expect(
       screen.getByRole('heading', { name: 'Your enquiry was received' }),

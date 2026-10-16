@@ -328,7 +328,13 @@ function validateTransactions(transactions, accountIds, errors) {
       addError(errors, `${path}.type`, 'Contains an unsupported transaction type.');
     }
 
-    if (!isFiniteAmount(transaction.amount) || transaction.amount === 0) {
+    const allowsZeroAmount =
+      transaction.status === 'failed' || transaction.status === 'cancelled';
+
+    if (
+      !isFiniteAmount(transaction.amount) ||
+      (transaction.amount === 0 && !allowsZeroAmount)
+    ) {
       addError(
         errors,
         `${path}.amount`,

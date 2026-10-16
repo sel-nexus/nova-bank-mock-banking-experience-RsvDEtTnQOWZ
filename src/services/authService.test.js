@@ -4,7 +4,7 @@ import { STORAGE_KEYS } from '../config/constants.js';
 import storageService from './storageService.js';
 
 const VALID_USER_ID = 'user-miguel-santos';
-const VALID_PASSWORD = 'NovaDemo123!';
+const VALID_PASSWORD = 'demo-only';
 
 describe('AuthService', () => {
   beforeEach(() => {

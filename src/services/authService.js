@@ -230,6 +230,7 @@ export function validateCredentials(userId, password) {
     password !== credential.password
   ) {
     return {
+      success: false,
       valid: false,
       error: {
         code: 'INVALID_CREDENTIALS',

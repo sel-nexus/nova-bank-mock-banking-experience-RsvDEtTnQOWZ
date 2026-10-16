@@ -15,12 +15,12 @@ const STATUS_LABELS = Object.freeze({
 const STATUS_STYLES = Object.freeze({
   posted: 'bg-nova-mint text-nova-teal',
   completed: 'bg-nova-mint text-nova-teal',
-  pending: 'bg-nova-gold/30 text-nova-ink',
-  declined: 'bg-nova-coral/20 text-nova-midnight',
-  failed: 'bg-nova-coral/20 text-nova-midnight',
-  cancelled: 'bg-nova-coral/20 text-nova-midnight',
-  active: 'bg-nova-sky text-nova-blue',
-  simulated: 'bg-nova-sky text-nova-teal',
+  pending: 'bg-[#FEF4C8] text-[#1A1A1A]',
+  declined: 'bg-nova-sky text-nova-navy',
+  failed: 'bg-nova-sky text-nova-navy',
+  cancelled: 'bg-nova-sky text-nova-navy',
+  active: 'bg-nova-mint text-nova-teal',
+  simulated: 'bg-[#FEF4C8] text-[#1A1A1A]',
 });
 
 function normalizeStatus(value) {
@@ -57,12 +57,12 @@ function getStatusLabel(status, label, children) {
  * @returns {JSX.Element}
  */
 function StatusBadge({
-  status,
-  label,
-  variant,
-  simulated,
+  status = '',
+  label = '',
+  variant = '',
+  simulated = false,
   children,
-  className,
+  className = '',
 }) {
   const normalizedStatus = normalizeStatus(
     simulated ? 'simulated' : status || variant,
@@ -96,15 +96,6 @@ StatusBadge.propTypes = {
   simulated: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
-};
-
-StatusBadge.defaultProps = {
-  status: '',
-  label: '',
-  variant: '',
-  simulated: false,
-  children: undefined,
-  className: '',
 };
 
 export { StatusBadge };

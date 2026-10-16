@@ -44,7 +44,7 @@ function getAccountRoute(accountId) {
  * }} props
  * @returns {JSX.Element}
  */
-function AccountCard({ account, className, onSelect }) {
+function AccountCard({ account, className = '', onSelect }) {
   const accountType = getAccountTypeLabel(account.type);
   const accountName = safeDisplay(account.name, 'Unnamed account');
   const accountNumber = getAccountNumber(account);
@@ -100,11 +100,6 @@ AccountCard.propTypes = {
   account: PropTypes.object.isRequired,
   className: PropTypes.string,
   onSelect: PropTypes.func,
-};
-
-AccountCard.defaultProps = {
-  className: '',
-  onSelect: undefined,
 };
 
 export { AccountCard };

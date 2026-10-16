@@ -124,9 +124,7 @@ describe('statementFormatter', () => {
     expect(result.data?.mimeType).toBe('text/plain;charset=utf-8');
     expect(result.data?.text).toContain('Account number: •••• 5678');
 
-    await expect(result.data?.blob.text()).resolves.toContain(
-      'Everyday Checking Statement',
-    );
+    expect(result.data?.text).toContain('Account: Everyday Checking');
   });
 
   it('renders a safe empty transaction row when no statement rows are available', () => {

@@ -2,7 +2,18 @@ import React, { useEffect, useId, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from '../config/constants.js';
+import { FIXTURES } from '../fixtures/fixtures.js';
 import authService from '../services/authService.js';
+import { useAppContext } from '../state/AppProvider.jsx';
+
+const DEMO_PASSWORD =
+  FIXTURES.credentials.find((credential) => credential.username === 'miguel')
+    ?.password || '';
+const DEMO_ACCOUNTS = FIXTURES.personas.map((persona) => ({
+  name: persona.name,
+  userId: persona.username,
+  role: persona.role,
+}));
 
 function getRedirectLocation(location) {
   const from = location.state?.from;
@@ -40,9 +51,10 @@ function getErrorMessage(result) {
  * @param {{className?: string, onLogin?: Function}} props
  * @returns {JSX.Element}
  */
-function LoginPage({ className, onLogin }) {
+function LoginPage({ className = '', onLogin }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { actions } = useAppContext();
   const userIdInputId = useId();
   const passwordInputId = useId();
   const languageInputId = useId();
@@ -51,7 +63,7 @@ function LoginPage({ className, onLogin }) {
   const [password, setPassword] = useState('');
   const [rememberUserId, setRememberUserId] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [language, setLanguage] = useState('en-US');
+  const [language, setLanguage] = useState('en');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -82,13 +94,11 @@ function LoginPage({ className, onLogin }) {
     setIsSubmitting(true);
 
     try {
-      const result = authService.login(
-        {
-          userId: normalizedUserId,
-          password,
-          rememberMe: rememberUserId,
-        },
-      );
+      const result = actions.login({
+        userId: normalizedUserId,
+        password,
+        rememberMe: rememberUserId,
+      });
 
       if (result?.success === false) {
         setError(getErrorMessage(result));
@@ -126,23 +136,23 @@ function LoginPage({ className, onLogin }) {
         .filter(Boolean)
         .join(' ')}
     >
-      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl items-center justify-center">
-        <section className="grid w-full overflow-hidden rounded-card border border-nova-slate/20 bg-white shadow-elevated lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="relative overflow-hidden bg-nova-midnight px-6 py-10 text-white sm:px-10 sm:py-12 lg:px-12 lg:py-14">
+      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[960px] items-center justify-center">
+        <section className="grid w-full overflow-hidden rounded-card border border-[#E9E9E9] bg-white shadow-elevated md:grid-cols-2">
+          <div className="relative overflow-hidden bg-nova-navy px-6 py-10 text-white sm:px-8 sm:py-12 md:px-8 md:py-12 lg:px-10">
             <div
               aria-hidden="true"
-              className="absolute -right-24 -top-24 h-64 w-64 rounded-full border-[28px] border-nova-blue/30"
+              className="absolute -right-24 -top-24 h-64 w-64 rounded-full border-[28px] border-white/15"
             />
             <div
               aria-hidden="true"
-              className="absolute -bottom-32 -left-20 h-72 w-72 rounded-full bg-nova-navy/70"
+              className="absolute -bottom-32 -left-20 h-72 w-72 rounded-full bg-black/15"
             />
 
             <div className="relative z-10 flex h-full flex-col">
               <div className="flex items-center gap-3">
                 <span
                   aria-hidden="true"
-                  className="flex h-12 w-12 items-center justify-center rounded-xl bg-nova-lime text-xl font-extrabold text-nova-midnight"
+                  className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#DCB91C] text-xl font-extrabold text-nova-midnight"
                 >
                   N
                 </span>
@@ -150,20 +160,20 @@ function LoginPage({ className, onLogin }) {
                   <p className="text-sm font-extrabold tracking-[0.18em]">
                     NOVA BANK
                   </p>
-                  <p className="mt-0.5 text-xs text-nova-sky">
-                    Synthetic banking experience
+                  <p className="mt-0.5 text-xs text-white/85">
+                    Secure Online Banking
                   </p>
                 </div>
               </div>
 
               <div className="mt-16 max-w-md lg:mt-24">
-                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-nova-lime">
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#FEF4C8]">
                   Welcome back
                 </p>
                 <h1 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl">
                   Banking made clear, simple, and yours.
                 </h1>
-                <p className="mt-5 text-base leading-7 text-nova-sky">
+                <p className="mt-5 text-base leading-7 text-white/90">
                   Sign in to explore your accounts, review activity, and try
                   simulated banking journeys in a safe demonstration
                   environment.
@@ -172,17 +182,17 @@ function LoginPage({ className, onLogin }) {
 
               <div className="mt-auto pt-12">
                 <div className="flex flex-wrap gap-2">
-                  <span className="rounded-full border border-nova-lime/40 bg-nova-lime/10 px-3 py-1.5 text-xs font-semibold text-nova-lime">
-                    Demo secure
+                  <span className="rounded-full border border-[#DCB91C]/70 bg-[#DCB91C]/15 px-3 py-1.5 text-xs font-semibold text-[#FEF4C8]">
+                    256-Bit SSL Encryption
                   </span>
-                  <span className="rounded-full border border-nova-sky/30 bg-nova-sky/10 px-3 py-1.5 text-xs font-semibold text-nova-sky">
-                    Synthetic data
+                  <span className="rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white">
+                    Fraud Monitoring Simulation
                   </span>
-                  <span className="rounded-full border border-nova-sky/30 bg-nova-sky/10 px-3 py-1.5 text-xs font-semibold text-nova-sky">
-                    Browser only
+                  <span className="rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white">
+                    Privacy Protected
                   </span>
                 </div>
-                <p className="mt-5 max-w-md text-xs leading-5 text-nova-sky/80">
+                <p className="mt-5 max-w-md text-xs leading-5 text-white/80">
                   Never enter real passwords, account numbers, or other
                   sensitive information into this demo.
                 </p>
@@ -217,9 +227,8 @@ function LoginPage({ className, onLogin }) {
                   onChange={(event) => setLanguage(event.target.value)}
                   className="min-h-10 rounded-lg border border-nova-slate/30 bg-white px-2 py-2 text-xs font-semibold text-nova-ink focus:border-nova-blue focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
                 >
-                  <option value="en-US">English</option>
-                  <option value="es-US">Español</option>
-                  <option value="fr-FR">Français</option>
+                  <option value="en">English</option>
+                  <option value="fil">Filipino</option>
                 </select>
               </div>
             </div>
@@ -330,11 +339,36 @@ function LoginPage({ className, onLogin }) {
               </button>
             </div>
 
-            <div className="mt-8 rounded-lg bg-nova-sky/60 px-4 py-3 text-xs leading-5 text-nova-slate">
+            <div className="mt-8 rounded-lg border border-[#DCB91C]/40 bg-[#FEF4C8] px-4 py-3 text-xs leading-5 text-nova-slate">
               <p className="font-semibold text-nova-midnight">
                 Demo credentials only
               </p>
               <p className="mt-1">
+                Choose a synthetic account to fill the form. The shared demo
+                password is <span className="font-semibold text-nova-midnight">{DEMO_PASSWORD}</span>.
+              </p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {DEMO_ACCOUNTS.map((account) => (
+                  <button
+                    key={account.userId}
+                    type="button"
+                    onClick={() => {
+                      setUserId(account.userId);
+                      setPassword(DEMO_PASSWORD);
+                      setError('');
+                    }}
+                    className="rounded-lg border border-nova-slate/20 bg-white px-3 py-2 text-left transition hover:border-nova-blue focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
+                  >
+                    <span className="block font-semibold text-nova-midnight">
+                      {account.name}
+                    </span>
+                    <span className="mt-0.5 block break-all text-nova-slate">
+                      {account.userId}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <p className="mt-3">
                 This experience does not connect to real financial accounts or
                 process real transactions.
               </p>
@@ -349,11 +383,6 @@ function LoginPage({ className, onLogin }) {
 LoginPage.propTypes = {
   className: PropTypes.string,
   onLogin: PropTypes.func,
-};
-
-LoginPage.defaultProps = {
-  className: '',
-  onLogin: undefined,
 };
 
 export { LoginPage };

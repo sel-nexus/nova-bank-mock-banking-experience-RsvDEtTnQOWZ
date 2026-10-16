@@ -130,19 +130,19 @@ function FaqAccordion({
   questions,
   search,
   query,
-  initialSearch,
+  initialSearch = '',
   expandedId,
   defaultExpandedId,
   onSearchChange,
   onToggle,
   onSelect,
-  searchLabel,
-  searchPlaceholder,
-  emptyTitle,
-  emptyDescription,
-  title,
-  description,
-  className,
+  searchLabel = 'Search frequently asked questions',
+  searchPlaceholder = 'Search login, filtering, rates, or available credit',
+  emptyTitle = 'No matching questions',
+  emptyDescription = 'Try a different search term or browse the available questions.',
+  title = 'Frequently asked questions',
+  description = 'Find quick answers about signing in, filtering and exporting activity, rates, and available credit.',
+  className = '',
 }) {
   const searchInputId = useId();
   const listId = useId();
@@ -342,29 +342,6 @@ FaqAccordion.propTypes = {
   title: PropTypes.node,
   description: PropTypes.node,
   className: PropTypes.string,
-};
-
-FaqAccordion.defaultProps = {
-  faqs: undefined,
-  items: undefined,
-  questions: undefined,
-  search: undefined,
-  query: undefined,
-  initialSearch: '',
-  expandedId: undefined,
-  defaultExpandedId: undefined,
-  onSearchChange: undefined,
-  onToggle: undefined,
-  onSelect: undefined,
-  searchLabel: 'Search frequently asked questions',
-  searchPlaceholder: 'Search login, filtering, rates, or available credit',
-  emptyTitle: 'No matching questions',
-  emptyDescription:
-    'Try a different search term or browse the available questions.',
-  title: 'Frequently asked questions',
-  description:
-    'Find quick answers about signing in, filtering and exporting activity, rates, and available credit.',
-  className: '',
 };
 
 export { FaqAccordion };

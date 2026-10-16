@@ -164,19 +164,19 @@ function ProductOfferCard({
   product,
   offer,
   type,
-  category,
-  recommended,
-  featured,
-  validFrom,
-  validUntil,
+  category = '',
+  recommended = false,
+  featured = false,
+  validFrom = '',
+  validUntil = '',
   eligibility,
-  detailRoute,
-  detailLabel,
+  detailRoute = '',
+  detailLabel = 'View details',
   onDetail,
   onDetails,
   onSelect,
-  className,
-  compact,
+  className = '',
+  compact = false,
 }) {
   const catalogueItem = item || product || offer || {};
   const itemType = getItemType(catalogueItem, type);
@@ -326,26 +326,6 @@ ProductOfferCard.propTypes = {
   onSelect: PropTypes.func,
   className: PropTypes.string,
   compact: PropTypes.bool,
-};
-
-ProductOfferCard.defaultProps = {
-  item: undefined,
-  product: undefined,
-  offer: undefined,
-  type: undefined,
-  category: '',
-  recommended: false,
-  featured: false,
-  validFrom: '',
-  validUntil: '',
-  eligibility: undefined,
-  detailRoute: '',
-  detailLabel: 'View details',
-  onDetail: undefined,
-  onDetails: undefined,
-  onSelect: undefined,
-  className: '',
-  compact: false,
 };
 
 export { ProductOfferCard };

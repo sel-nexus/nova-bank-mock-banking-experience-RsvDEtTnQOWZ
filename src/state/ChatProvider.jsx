@@ -405,4 +405,13 @@ export function useChat() {
   return useChatContext();
 }
 
+/**
+ * Returns chat actions when the provider is mounted.
+ *
+ * @returns {Object|null}
+ */
+export function useOptionalChat() {
+  return useContext(ChatContext);
+}
+
 export default ChatProvider;

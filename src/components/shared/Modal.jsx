@@ -7,6 +7,8 @@ import React, {
 import PropTypes from 'prop-types';
 import { createPortal } from 'react-dom';
 
+const noop = () => {};
+
 const FOCUSABLE_SELECTOR = [
   'a[href]',
   'area[href]',
@@ -61,19 +63,19 @@ function getDocument() {
  * @returns {JSX.Element|null}
  */
 function Modal({
-  open,
-  isOpen,
-  onClose,
+  open = false,
+  isOpen = false,
+  onClose = noop,
   title,
-  titleId: providedTitleId,
-  children,
-  closeLabel,
-  showCloseButton,
-  closeOnBackdrop,
-  closeOnEscape,
-  initialFocusRef,
-  className,
-  contentClassName,
+  titleId: providedTitleId = '',
+  children = null,
+  closeLabel = 'Close dialog',
+  showCloseButton = true,
+  closeOnBackdrop = true,
+  closeOnEscape = true,
+  initialFocusRef = null,
+  className = '',
+  contentClassName = '',
   labelledBy,
   describedBy,
 }) {
@@ -323,24 +325,6 @@ Modal.propTypes = {
   contentClassName: PropTypes.string,
   labelledBy: PropTypes.string,
   describedBy: PropTypes.string,
-};
-
-Modal.defaultProps = {
-  open: false,
-  isOpen: false,
-  onClose: () => {},
-  title: undefined,
-  titleId: '',
-  children: null,
-  closeLabel: 'Close dialog',
-  showCloseButton: true,
-  closeOnBackdrop: true,
-  closeOnEscape: true,
-  initialFocusRef: null,
-  className: '',
-  contentClassName: '',
-  labelledBy: undefined,
-  describedBy: undefined,
 };
 
 export { Modal };

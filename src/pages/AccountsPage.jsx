@@ -67,7 +67,7 @@ function getAccountTypeLabel(type) {
  * }} props
  * @returns {JSX.Element}
  */
-function AccountsPage({ personaId: providedPersonaId, accounts: providedAccounts, className }) {
+function AccountsPage({ personaId: providedPersonaId = '', accounts: providedAccounts, className = '' }) {
   const { persona, session } = useAppContext();
 
   const activePersonaId = getPersonaId(
@@ -203,7 +203,7 @@ function AccountsPage({ personaId: providedPersonaId, accounts: providedAccounts
 
         <NavLink
           to={ROUTES.dashboard}
-          className="hidden min-h-11 shrink-0 items-center rounded-lg border border-nova-navy px-4 py-2 text-sm font-semibold text-nova-navy transition hover:bg-nova-sky focus:outline-none focus:ring-4 focus:ring-nova-blue/20 sm:inline-flex"
+          className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-nova-navy px-4 py-2 text-sm font-semibold text-nova-navy transition hover:bg-nova-sky focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
         >
           Back to dashboard
         </NavLink>
@@ -211,7 +211,7 @@ function AccountsPage({ personaId: providedPersonaId, accounts: providedAccounts
 
       <section
         aria-labelledby="accounts-summary-title"
-        className="mb-8 grid gap-4 sm:grid-cols-3"
+        className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3"
       >
         <h2 id="accounts-summary-title" className="sr-only">
           Account summary
@@ -273,7 +273,7 @@ function AccountsPage({ personaId: providedPersonaId, accounts: providedAccounts
             )}
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {accounts.map((account) => (
               <NavLink
                 key={account.id}
@@ -329,10 +329,6 @@ function AccountsPage({ personaId: providedPersonaId, accounts: providedAccounts
         </section>
       )}
 
-      <p className="mt-8 rounded-lg bg-nova-sky/60 px-4 py-3 text-sm text-nova-slate">
-        Account numbers are masked for privacy. All balances and account
-        information shown are synthetic demo data.
-      </p>
     </div>
   );
 }
@@ -341,12 +337,6 @@ AccountsPage.propTypes = {
   personaId: PropTypes.string,
   accounts: PropTypes.arrayOf(PropTypes.object),
   className: PropTypes.string,
-};
-
-AccountsPage.defaultProps = {
-  personaId: '',
-  accounts: undefined,
-  className: '',
 };
 
 export { AccountsPage };

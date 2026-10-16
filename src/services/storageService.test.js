@@ -13,7 +13,7 @@ describe('StorageService', () => {
   it('persists allowlisted values in a versioned envelope and removes password fields', () => {
     const result = storageService.setStorageItem(STORAGE_KEYS.user, {
       id: 'user-miguel-santos',
-      password: 'NovaDemo123!',
+      password: 'demo-only',
       profile: {
         passcode: '1234',
         label: 'Demo user',
@@ -33,7 +33,7 @@ describe('StorageService', () => {
     const rawValue = localStorage.getItem(STORAGE_KEYS.user);
 
     expect(rawValue).toContain('"version":1');
-    expect(rawValue).not.toContain('NovaDemo123!');
+    expect(rawValue).not.toContain('demo-only');
     expect(rawValue).not.toContain('passcode');
   });
 

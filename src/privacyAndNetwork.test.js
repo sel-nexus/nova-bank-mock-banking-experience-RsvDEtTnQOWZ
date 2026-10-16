@@ -88,7 +88,7 @@ describe('privacy and network gate', () => {
     expect(
       storageService.setStorageItem('nova-bank-user', {
         id: 'user-miguel-santos',
-        password: 'NovaDemo123!',
+        password: 'demo-only',
         passcode: '1234',
         credentials: {
           password: 'another-demo-password',
@@ -98,7 +98,7 @@ describe('privacy and network gate', () => {
 
     const persistedValues = getPersistedStorageValues().join(' ');
 
-    expect(persistedValues).not.toContain('NovaDemo123!');
+    expect(persistedValues).not.toContain('demo-only');
     expect(persistedValues).not.toContain('another-demo-password');
     expect(storageService.getStorageItem('nova-bank-user', null)).toEqual({
       id: 'user-miguel-santos',
@@ -109,7 +109,7 @@ describe('privacy and network gate', () => {
   it('does not persist a password when authenticating with valid demo credentials', () => {
     const result = authService.login({
       userId: 'user-miguel-santos',
-      password: 'NovaDemo123!',
+      password: 'demo-only',
       rememberMe: true,
     });
 
@@ -117,7 +117,7 @@ describe('privacy and network gate', () => {
 
     const persistedValues = getPersistedStorageValues().join(' ');
 
-    expect(persistedValues).not.toContain('NovaDemo123!');
+    expect(persistedValues).not.toContain('demo-only');
     expect(storageService.getStorageItem('nova-bank-user', null)).not.toHaveProperty(
       'password',
     );
@@ -126,7 +126,7 @@ describe('privacy and network gate', () => {
 
   it('redacts prohibited fields and sensitive values before analytics storage or logging', () => {
     const event = analyticsService.recordEvent('privacy_gate', {
-      password: 'NovaDemo123!',
+      password: 'demo-only',
       accountNumber: '100012345678',
       email: 'miguel.santos@example.test',
       safeValue: 'synthetic demo value',
@@ -145,7 +145,7 @@ describe('privacy and network gate', () => {
     );
 
     const sensitiveValue = {
-      password: 'NovaDemo123!',
+      password: 'demo-only',
       accountNumber: '100012345678',
       nested: {
         token: 'demo-token',
@@ -190,9 +190,11 @@ describe('privacy and network gate', () => {
   it('does not expose full account identifiers through production display markup', () => {
     const unmaskedAccountNumberUsages = getProductionSource()
       .filter(({ relativePath, source }) => {
+        const normalizedPath = relativePath.replaceAll('\\', '/');
+
         if (
-          relativePath === 'fixtures/fixtures.js' ||
-          relativePath === 'utils/formatters.js'
+          normalizedPath === 'fixtures/fixtures.js' ||
+          normalizedPath === 'utils/formatters.js'
         ) {
           return false;
         }
@@ -215,9 +217,13 @@ describe('privacy and network gate', () => {
     const productionSource = getProductionSource();
 
     productionSource
-      .filter(({ relativePath }) => relativePath !== 'fixtures/fixtures.js')
+      .filter(
+        ({ relativePath }) =>
+          relativePath.replaceAll('\\', '/') !== 'fixtures/fixtures.js',
+      )
       .forEach(({ source }) => {
-        expect(source).not.toContain('NovaDemo123!');
+        expect(source).not.toContain("'demo-only'");
+        expect(source).not.toContain('"demo-only"');
       });
 
     expect(FIXTURES.credentials).toEqual(

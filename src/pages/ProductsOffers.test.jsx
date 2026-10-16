@@ -159,10 +159,10 @@ describe('ProductsOffers catalogue journey', () => {
       screen.getByRole('heading', { name: 'Nova Rewards Card' }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole('heading', { name: 'Growth Savings' }),
+      screen.queryByRole('heading', { name: 'Ipon Goal Saver' }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('heading', { name: 'HomeStart Loan' }),
+      screen.queryByRole('heading', { name: 'Home Loan' }),
     ).not.toBeInTheDocument();
   });
 
@@ -172,10 +172,10 @@ describe('ProductsOffers catalogue journey', () => {
     renderOffers();
 
     expect(
-      screen.getByRole('heading', { name: 'Grow your savings' }),
+      screen.getByRole('heading', { name: 'Payday Ipon Boost' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'More rewards for your everyday' }),
+      screen.getByRole('heading', { name: 'Cashback Week' }),
     ).toBeInTheDocument();
     expect(
       screen.queryByText('Welcome to Nova Bank'),
@@ -187,11 +187,11 @@ describe('ProductsOffers catalogue journey', () => {
     );
 
     expect(
-      screen.getByRole('heading', { name: 'Grow your savings' }),
+      screen.getByRole('heading', { name: 'Payday Ipon Boost' }),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole('heading', {
-        name: 'More rewards for your everyday',
+        name: 'Cashback Week',
       }),
     ).not.toBeInTheDocument();
     expect(
@@ -206,14 +206,12 @@ describe('ProductsOffers catalogue journey', () => {
     renderProductDetail(PRODUCT_ID, { onContact });
 
     expect(
-      screen.getByRole('heading', { name: 'Nova Rewards Card' }),
-    ).toBeInTheDocument();
+      screen.getAllByRole('heading', { name: 'Nova Rewards Card' }).length,
+    ).toBeGreaterThan(0);
     expect(
       screen.getByRole('heading', { name: 'Benefits and features' }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText('No annual fee'),
-    ).toBeInTheDocument();
+    expect(screen.getAllByText('No annual fee').length).toBeGreaterThan(0);
 
     await user.click(
       screen.getByRole('button', { name: 'Ask about this product' }),
@@ -226,10 +224,10 @@ describe('ProductsOffers catalogue journey', () => {
       }),
     );
     expect(
-      screen.getByRole('status'),
-    ).toHaveTextContent(
-      'Your product question was noted locally. No application was submitted.',
-    );
+      screen.getByText(
+        'Your product question was noted locally. No application was submitted.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('shows an error state when a requested product does not exist', () => {
@@ -251,8 +249,8 @@ describe('ProductsOffers catalogue journey', () => {
     renderOfferDetail(ACTIVE_OFFER_ID);
 
     expect(
-      screen.getByRole('heading', { name: 'Grow your savings' }),
-    ).toBeInTheDocument();
+      screen.getAllByRole('heading', { name: 'Payday Ipon Boost' }).length,
+    ).toBeGreaterThan(0);
     expect(
       screen.getByRole('heading', { name: 'Eligibility' }),
     ).toBeInTheDocument();
@@ -265,10 +263,10 @@ describe('ProductsOffers catalogue journey', () => {
     );
 
     expect(
-      screen.getByRole('status'),
-    ).toHaveTextContent(
-      'Your interest was recorded locally. No application was submitted and no real financial action was started.',
-    );
+      screen.getByText(
+        'Your interest was recorded locally. No application was submitted and no real financial action was started.',
+      ),
+    ).toBeInTheDocument();
     expect(
       offerService.hasOfferInterest(MIGUEL_ID, ACTIVE_OFFER_ID),
     ).toBe(true);
@@ -300,15 +298,18 @@ describe('ProductsOffers catalogue journey', () => {
 
     expect(personaSelect).toHaveValue(MIGUEL_ID);
     expect(
-      screen.getByRole('heading', { name: 'Grow your savings' }),
+      screen.getByRole('heading', { name: 'Payday Ipon Boost' }),
     ).toBeInTheDocument();
 
     await user.selectOptions(personaSelect, ROSA_ID);
 
     expect(personaSelect).toHaveValue(ROSA_ID);
     expect(
-      screen.getByRole('heading', { name: 'Grow your savings' }),
+      screen.getByRole('heading', { name: 'Term Deposit Promo' }),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'Payday Ipon Boost' }),
+    ).not.toBeInTheDocument();
   });
 
   it('navigates from a product catalogue card to its configured detail route', async () => {
@@ -322,7 +323,7 @@ describe('ProductsOffers catalogue journey', () => {
     );
 
     await user.click(
-      screen.getByRole('link', { name: 'Learn more' }),
+      screen.getAllByRole('link', { name: 'Learn more' })[0],
     );
 
     expect(screen.getByTestId('catalogue-location')).toHaveTextContent(

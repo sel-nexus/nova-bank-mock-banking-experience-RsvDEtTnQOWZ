@@ -37,10 +37,10 @@ export const PRIVACY_COPY = Object.freeze({
 });
 
 export const CURRENCY = Object.freeze({
-  code: 'USD',
-  symbol: '$',
-  name: 'US Dollar',
-  locale: 'en-US',
+  code: 'PHP',
+  symbol: 'PHP',
+  name: 'Philippine Peso',
+  locale: 'en-PH',
   decimals: 2,
 });
 
@@ -58,8 +58,8 @@ export const DEMO_CONSTANTS = Object.freeze({
   minimumTransferAmount: 1,
   transactionPageSize: 10,
   recentTransactionCount: 5,
-  initialBalance: 12500,
-  initialSavingsBalance: 28450,
+  initialBalance: 26240.15,
+  initialSavingsBalance: 116620.1,
 });
 
 export const CURRENCY_CODE = CURRENCY.code;

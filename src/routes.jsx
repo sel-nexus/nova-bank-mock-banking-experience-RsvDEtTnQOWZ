@@ -11,6 +11,7 @@ import { OffersPage } from './pages/OffersPage.jsx';
 import { PortfolioPage } from './pages/PortfolioPage.jsx';
 import { ProductDetailPage } from './pages/ProductDetailPage.jsx';
 import { ProductsPage } from './pages/ProductsPage.jsx';
+import { ProfilePage } from './pages/ProfilePage.jsx';
 import { SupportPage } from './pages/SupportPage.jsx';
 
 function RouteUnavailable({ title }) {
@@ -49,6 +50,7 @@ function AppRoutes() {
 
       <Route path={ROUTES.login} element={<LoginPage />} />
       <Route path={ROUTES.help} element={<SupportPage />} />
+      <Route path="/support" element={<SupportPage />} />
       <Route path="/contact" element={<ContactPage />} />
 
       <Route element={<ProtectedRoute />}>
@@ -65,6 +67,7 @@ function AppRoutes() {
         />
         <Route path="/offers" element={<OffersPage />} />
         <Route path="/offers/:offerId" element={<OfferDetailPage />} />
+        <Route path={ROUTES.profile} element={<ProfilePage />} />
       </Route>
 
       <Route
@@ -78,10 +81,6 @@ function AppRoutes() {
       <Route
         path={ROUTES.transactions}
         element={<ProtectedPlaceholder title="Transactions" />}
-      />
-      <Route
-        path={ROUTES.profile}
-        element={<ProtectedPlaceholder title="Profile" />}
       />
       <Route
         path={ROUTES.settings}

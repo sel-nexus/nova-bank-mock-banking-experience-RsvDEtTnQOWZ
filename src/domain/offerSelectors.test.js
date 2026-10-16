@@ -38,7 +38,14 @@ describe('offerSelectors', () => {
 
     expect(activeOffers.map((offer) => offer.id)).toEqual([
       'offer-savings-bonus',
+      'offer-ipon-bonus',
+      'offer-peso-savings-bonus',
       'offer-rewards-card',
+      'offer-dining-cashback',
+      'offer-personal-loan',
+      'offer-home-loan-waiver',
+      'offer-term-deposit',
+      'offer-referral-reward',
     ]);
     expect(filterActiveOffers(FIXTURES.offers)).toEqual(activeOffers);
   });
@@ -77,9 +84,15 @@ describe('offerSelectors', () => {
 
     expect(selectOffersByCategory(offers, 'savings').map((offer) => offer.id)).toEqual([
       'offer-savings-bonus',
+      'offer-ipon-bonus',
+      'offer-peso-savings-bonus',
+      'offer-term-deposit',
+      'offer-referral-reward',
     ]);
     expect(filterOffersByCategory(offers, 'CARDS').map((offer) => offer.id)).toEqual([
       'offer-rewards-card',
+      'offer-dining-cashback',
+      'offer-welcome-bonus',
     ]);
     expect(isOfferInCategory(FIXTURES.offers[0], 'SAVINGS')).toBe(true);
     expect(isOfferInCategory(FIXTURES.offers[0], 'cards')).toBe(false);

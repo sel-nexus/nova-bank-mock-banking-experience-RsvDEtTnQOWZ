@@ -49,7 +49,7 @@ function ChatDrawer({
   onMinimize,
   onRestore,
   onEscalate,
-  className,
+  className = '',
 }) {
   const chat = useChatContext();
   const inputId = useId();
@@ -172,11 +172,11 @@ function ChatDrawer({
       data-testid="chat-drawer"
       role="dialog"
     >
-      <header className="flex items-center justify-between gap-3 bg-nova-midnight px-4 py-3 text-white">
+      <header className="flex items-center justify-between gap-3 bg-nova-navy px-4 py-3 text-white">
         <div className="min-w-0">
           <p className="truncate font-bold">Nova Support</p>
           {!isMinimized && (
-            <p className="text-xs text-nova-sky">Synthetic chat assistance</p>
+            <p className="text-xs text-white/85">Synthetic chat assistance</p>
           )}
         </div>
 
@@ -316,7 +316,7 @@ function ChatDrawer({
               <button
                 type="button"
                 onClick={handleEscalate}
-                disabled={isLoading || !personaId}
+                disabled={isLoading}
                 className="shrink-0 text-xs font-semibold text-nova-blue underline-offset-2 transition hover:text-nova-midnight hover:underline focus:outline-none focus:ring-4 focus:ring-nova-blue/20 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Escalate
@@ -343,17 +343,6 @@ ChatDrawer.propTypes = {
   onRestore: PropTypes.func,
   onEscalate: PropTypes.func,
   className: PropTypes.string,
-};
-
-ChatDrawer.defaultProps = {
-  open: undefined,
-  isOpen: undefined,
-  authenticated: undefined,
-  onClose: undefined,
-  onMinimize: undefined,
-  onRestore: undefined,
-  onEscalate: undefined,
-  className: '',
 };
 
 export { ChatDrawer };

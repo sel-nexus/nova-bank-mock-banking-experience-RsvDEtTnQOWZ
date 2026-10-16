@@ -2,23 +2,43 @@ import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ROUTES } from '../config/constants.js';
 import supportService from '../services/supportService.js';
+import { useOptionalChat } from '../state/ChatProvider.jsx';
 import { EmptyState } from '../components/shared/EmptyState.jsx';
-import { PrivacyBanner } from '../components/shared/PrivacyBanner.jsx';
-
 const HOTLINES = Object.freeze([
   {
-    id: 'demo-support',
-    name: 'Nova Demo Support',
-    description: 'Questions about using this synthetic banking experience.',
-    phone: '1-800-555-0100',
-    hours: 'Monday–Friday, 9:00 AM–5:00 PM',
+    id: 'call-us',
+    name: 'Call Us',
+    description: 'Sample customer service hotline',
+    phone: '(+63 2) 8000 0000',
+    hours: 'Mon–Fri 08:00–17:00',
+    action: 'Call sample',
   },
   {
-    id: 'technical-support',
-    name: 'Technical assistance',
-    description: 'Help with navigation, display, or demonstration issues.',
-    phone: '1-800-555-0111',
-    hours: 'Monday–Friday, 9:00 AM–5:00 PM',
+    id: 'secure-message',
+    name: 'Secure Message',
+    description: 'Online enquiry form simulation. Estimated response: 24h.',
+    phone: '',
+    hours: 'Simulated message only',
+    action: 'Open Message Form',
+    href: '/contact',
+  },
+  {
+    id: 'find-branch',
+    name: 'Find a Branch / ATM',
+    description: 'Static Metro Manila directory: Ayala, BGC, and Quezon Ave.',
+    phone: '',
+    hours: 'Sample locations',
+    action: 'View Locations',
+    href: '#branch-directory',
+  },
+  {
+    id: 'lost-card',
+    name: 'Lost or Stolen Card',
+    description: '24/7 emergency blocking hotline. Demonstration number only.',
+    phone: '(+63 2) 8000 0001',
+    hours: '24/7',
+    action: 'Report Lost Card',
+    urgent: true,
   },
 ]);
 
@@ -91,7 +111,7 @@ function getBranchServices(branch) {
 function SupportPage({
   faqs: providedFaqs,
   branches: providedBranches,
-  className,
+  className = '',
   onFaqSelect,
   onBranchSelect,
 }) {
@@ -105,6 +125,7 @@ function SupportPage({
   const [expandedFaqId, setExpandedFaqId] = useState(null);
   const [expandedBranchId, setExpandedBranchId] = useState(null);
   const [loadError, setLoadError] = useState('');
+  const chat = useOptionalChat();
 
   useEffect(() => {
     let isMounted = true;
@@ -187,7 +208,7 @@ function SupportPage({
   };
 
   return (
-    <div
+    <main
       className={['page-container', className].filter(Boolean).join(' ')}
       data-testid="support-page"
     >
@@ -197,17 +218,17 @@ function SupportPage({
             Help and support
           </p>
           <h1 className="mt-2 text-3xl font-bold text-nova-midnight sm:text-4xl">
-            How can we help?
+            How can we help today?
           </h1>
           <p className="mt-2 max-w-2xl text-base text-nova-slate">
-            Find answers, review sample support resources, or explore our
-            fictional branch directory.
+            You are using help and support as a Customer Support User. These
+            channels, FAQs, and the chat assistant are simulated.
           </p>
         </div>
 
         <a
           href={ROUTES.dashboard}
-          className="hidden min-h-11 shrink-0 items-center rounded-lg border border-nova-navy px-4 py-2 text-sm font-semibold text-nova-navy transition hover:bg-nova-sky focus:outline-none focus:ring-4 focus:ring-nova-blue/20 sm:inline-flex"
+          className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-nova-navy px-4 py-2 text-sm font-semibold text-nova-navy transition hover:bg-nova-sky focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
         >
           Back to dashboard
         </a>
@@ -224,56 +245,73 @@ function SupportPage({
 
       <section
         aria-labelledby="support-contact-title"
-        className="mb-8 grid gap-4 lg:grid-cols-2"
+        className="mb-8"
       >
-        <div className="surface-card p-5 sm:p-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-nova-teal">
-            Contact options
-          </p>
-          <h2
-            id="support-contact-title"
-            className="mt-2 text-2xl font-bold text-nova-midnight"
-          >
-            Sample support hotlines
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-nova-slate">
-            These sample numbers are provided for demonstration purposes only.
-            They do not connect to a real bank or support team.
-          </p>
-
-          <div className="mt-5 space-y-3">
-            {HOTLINES.map((hotline) => (
-              <div
-                key={hotline.id}
-                className="rounded-lg bg-nova-sky/60 p-4"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h3 className="font-bold text-nova-midnight">
-                      {hotline.name}
-                    </h3>
-                    <p className="mt-1 text-sm text-nova-slate">
-                      {hotline.description}
-                    </p>
-                  </div>
-                  <span
-                    aria-hidden="true"
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-nova-navy text-lg text-white"
-                  >
-                    ☎
-                  </span>
-                </div>
-                <p className="mt-4 text-xl font-bold text-nova-blue">
+        <h2
+          id="support-contact-title"
+          className="mb-4 text-2xl font-bold text-nova-midnight"
+        >
+          Contact channels
+        </h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {HOTLINES.map((hotline) => (
+            <article
+              key={hotline.id}
+              className={[
+                'surface-card flex h-full flex-col p-5',
+                hotline.urgent ? 'border-2 border-nova-navy' : '',
+              ].join(' ')}
+            >
+              <h3 className="text-lg font-bold text-nova-midnight">
+                {hotline.name}
+              </h3>
+              {hotline.phone && (
+                <p className="mt-3 text-lg font-bold text-nova-navy">
                   {hotline.phone}
                 </p>
-                <p className="mt-1 text-xs text-nova-slate">
-                  {hotline.hours}
+              )}
+              <p className="mt-2 flex-1 text-sm leading-6 text-nova-slate">
+                {hotline.description}
+              </p>
+              <p className="mt-2 text-xs font-semibold text-nova-slate">
+                {hotline.hours}
+              </p>
+              {hotline.href ? (
+                <a
+                  href={hotline.href}
+                  className="mt-4 inline-flex min-h-10 items-center text-sm font-semibold text-nova-navy underline-offset-2 hover:underline"
+                >
+                  {hotline.action}
+                </a>
+              ) : (
+                <p className="mt-4 text-sm font-semibold text-nova-navy">
+                  {hotline.action}
                 </p>
-              </div>
-            ))}
-          </div>
+              )}
+            </article>
+          ))}
         </div>
+      </section>
 
+      <section
+        aria-label="Immediate assistance"
+        className="mb-8 rounded-card bg-[#FEF4C8] px-5 py-5 sm:px-6"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <p className="max-w-2xl font-semibold text-nova-midnight">
+            Need immediate help? Start a secure demonstration chat with the Nova Bank Assistant.
+          </p>
+          <button
+            type="button"
+            onClick={() => chat?.openChat?.()}
+            className="min-h-11 rounded-lg bg-nova-navy px-4 py-2 text-sm font-semibold text-white transition hover:bg-nova-midnight focus:outline-none focus:ring-4 focus:ring-nova-blue/30"
+          >
+            Launch Chat Assistant
+          </button>
+        </div>
+      </section>
+
+      <section className="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="surface-card p-5 sm:p-6">
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-nova-teal">
             Safety first
@@ -441,7 +479,7 @@ function SupportPage({
         </div>
       </section>
 
-      <section aria-labelledby="branch-directory-title" className="mb-8">
+      <section id="branch-directory" aria-labelledby="branch-directory-title" className="mb-8">
         <div className="mb-5">
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-nova-blue">
             Locations
@@ -547,9 +585,7 @@ function SupportPage({
           />
         )}
       </section>
-
-      <PrivacyBanner compact />
-    </div>
+    </main>
   );
 }
 
@@ -559,14 +595,6 @@ SupportPage.propTypes = {
   className: PropTypes.string,
   onFaqSelect: PropTypes.func,
   onBranchSelect: PropTypes.func,
-};
-
-SupportPage.defaultProps = {
-  faqs: undefined,
-  branches: undefined,
-  className: '',
-  onFaqSelect: undefined,
-  onBranchSelect: undefined,
 };
 
 export { SupportPage };

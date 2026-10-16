@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { PRIVACY_COPY } from '../../config/constants.js';
 
-function PrivacyBanner({ className, compact }) {
+function PrivacyBanner({ className = '', compact = false }) {
   const containerClassName = [
-    'w-full border-y border-nova-navy/10 bg-nova-sky/70 text-nova-ink',
+    'w-full border-y border-[#DCB91C] bg-[#FEF4C8] text-nova-ink',
     compact ? 'px-4 py-3' : 'px-4 py-4 sm:px-6',
     className,
   ]
@@ -50,11 +50,6 @@ function PrivacyBanner({ className, compact }) {
 PrivacyBanner.propTypes = {
   className: PropTypes.string,
   compact: PropTypes.bool,
-};
-
-PrivacyBanner.defaultProps = {
-  className: '',
-  compact: false,
 };
 
 export { PrivacyBanner };

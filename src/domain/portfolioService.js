@@ -4,6 +4,11 @@ import {
   FIXTURES,
 } from '../fixtures/fixtures.js';
 import { formatCurrency, maskAccountNumber } from '../utils/formatters.js';
+import { isOfferEligible } from './offerSelectors.js';
+import {
+  calculateRelationshipBalance,
+  isDepositAccount,
+} from './portfolioSelectors.js';
 
 const RECOMMENDATION_ORDER = ['checking', 'savings', 'credit', 'loan', 'investment'];
 
@@ -128,25 +133,17 @@ function selectRecommendedProducts(accounts, options = {}) {
 }
 
 function createPortfolio(persona, accounts, transactions, options = {}) {
-  const totalBalance = accounts.reduce(
-    (total, account) => total + (Number.isFinite(account.balance) ? account.balance : 0),
-    0,
-  );
-  const totalAvailableBalance = accounts.reduce(
-    (total, account) =>
-      total +
-      (Number.isFinite(account.availableBalance)
-        ? account.availableBalance
-        : Number.isFinite(account.balance)
-          ? account.balance
-          : 0),
-    0,
-  );
+  const depositAccounts = accounts.filter((account) => isDepositAccount(account));
+  const totalBalance = calculateRelationshipBalance(depositAccounts, {
+    balanceField: 'availableBalance',
+  });
+  const totalAvailableBalance = totalBalance;
   const pendingTransactions = transactions.filter(
     (transaction) => transaction.status === 'pending',
   );
   const availableOffers = FIXTURES.offers.filter(
-    (offer) => offer.status === 'available',
+    (offer) =>
+      offer.status === 'available' && isOfferEligible(offer, persona?.id),
   );
 
   return {

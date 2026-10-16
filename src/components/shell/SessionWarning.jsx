@@ -8,7 +8,7 @@ import { Modal } from '../shared/Modal.jsx';
 function SessionWarning({
   onContinue,
   onSignIn,
-  className,
+  className = '',
 }) {
   const navigate = useNavigate();
   const continueButtonRef = useRef(null);
@@ -146,12 +146,6 @@ SessionWarning.propTypes = {
   onContinue: PropTypes.func,
   onSignIn: PropTypes.func,
   className: PropTypes.string,
-};
-
-SessionWarning.defaultProps = {
-  onContinue: undefined,
-  onSignIn: undefined,
-  className: '',
 };
 
 export { SessionWarning };

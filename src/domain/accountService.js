@@ -242,7 +242,7 @@ export function getAccountCount(personaOrId = DEFAULT_FIXTURE_USER_ID) {
   return getOwnedFixtureAccounts(personaOrId).length;
 }
 
-export const accountService = Object.freeze({
+export const accountService = {
   getAccountById,
   getAccountCount,
   getAccountDetails,
@@ -252,6 +252,6 @@ export const accountService = Object.freeze({
   isAccountOwnedByPersona,
   listAccounts,
   validateAccountOwnership,
-});
+};
 
 export default accountService;

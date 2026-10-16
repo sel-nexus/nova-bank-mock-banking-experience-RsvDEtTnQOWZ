@@ -85,7 +85,7 @@ function getRelationshipExclusionReason(account, providedReason) {
  * @returns {JSX.Element}
  */
 function BalanceBreakdown({
-  account,
+  account = {},
   balance,
   currentBalance,
   ledgerBalance,
@@ -97,9 +97,9 @@ function BalanceBreakdown({
   interestRate,
   excludeFromRelationshipBalance,
   relationshipBalanceExcluded,
-  relationshipBalanceExclusionReason,
-  currency,
-  className,
+  relationshipBalanceExclusionReason = '',
+  currency = '',
+  className = '',
 }) {
   const titleId = useId();
   const accountData = account || {};
@@ -265,24 +265,6 @@ BalanceBreakdown.propTypes = {
   relationshipBalanceExclusionReason: PropTypes.string,
   currency: PropTypes.string,
   className: PropTypes.string,
-};
-
-BalanceBreakdown.defaultProps = {
-  account: {},
-  balance: undefined,
-  currentBalance: undefined,
-  ledgerBalance: undefined,
-  availableBalance: undefined,
-  pendingBalance: undefined,
-  pendingAmount: undefined,
-  annualInterest: undefined,
-  annualInterestRate: undefined,
-  interestRate: undefined,
-  excludeFromRelationshipBalance: undefined,
-  relationshipBalanceExcluded: undefined,
-  relationshipBalanceExclusionReason: '',
-  currency: '',
-  className: '',
 };
 
 export { BalanceBreakdown };

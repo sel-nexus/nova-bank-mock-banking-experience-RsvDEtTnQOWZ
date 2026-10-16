@@ -32,9 +32,9 @@ function sanitizeFilename(value) {
     return DEFAULT_FILENAME;
   }
 
-  return normalizedValue.toLowerCase().endsWith('.txt')
-    ? normalizedValue
-    : `${normalizedValue}.txt`;
+  const filename = normalizedValue.toLowerCase();
+
+  return filename.endsWith('.txt') ? filename : `${filename}.txt`;
 }
 
 function resolveFilename(options) {

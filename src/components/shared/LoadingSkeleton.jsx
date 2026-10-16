@@ -31,7 +31,7 @@ function joinClasses(...values) {
   return values.filter(Boolean).join(' ');
 }
 
-function SkeletonBar({ className }) {
+function SkeletonBar({ className = '' }) {
   return (
     <span
       aria-hidden="true"
@@ -47,11 +47,7 @@ SkeletonBar.propTypes = {
   className: PropTypes.string,
 };
 
-SkeletonBar.defaultProps = {
-  className: '',
-};
-
-function AccountSkeleton({ compact }) {
+function AccountSkeleton({ compact = false }) {
   return (
     <section
       aria-hidden="true"
@@ -87,11 +83,7 @@ AccountSkeleton.propTypes = {
   compact: PropTypes.bool,
 };
 
-AccountSkeleton.defaultProps = {
-  compact: false,
-};
-
-function CardSkeleton({ compact }) {
+function CardSkeleton({ compact = false }) {
   return (
     <section
       aria-hidden="true"
@@ -121,11 +113,7 @@ CardSkeleton.propTypes = {
   compact: PropTypes.bool,
 };
 
-CardSkeleton.defaultProps = {
-  compact: false,
-};
-
-function TableSkeleton({ rows }) {
+function TableSkeleton({ rows = 5 }) {
   const rowCount = normalizeCount(rows, 5);
 
   return (
@@ -171,11 +159,7 @@ TableSkeleton.propTypes = {
   rows: PropTypes.number,
 };
 
-TableSkeleton.defaultProps = {
-  rows: 5,
-};
-
-function PageSkeleton({ rows, cardCount }) {
+function PageSkeleton({ rows = 5, cardCount = 3 }) {
   const normalizedCardCount = normalizeCount(cardCount, 3, 6);
 
   return (
@@ -204,11 +188,6 @@ PageSkeleton.propTypes = {
   cardCount: PropTypes.number,
 };
 
-PageSkeleton.defaultProps = {
-  rows: 5,
-  cardCount: 3,
-};
-
 /**
  * Renders an accessible loading skeleton for common banking content.
  *
@@ -225,14 +204,14 @@ PageSkeleton.defaultProps = {
  * @returns {JSX.Element}
  */
 function LoadingSkeleton({
-  variant,
-  type,
-  rows,
+  variant = 'page',
+  type = '',
+  rows = 5,
   count,
-  cardCount,
-  compact,
-  label,
-  className,
+  cardCount = 3,
+  compact = false,
+  label = '',
+  className = '',
 }) {
   const normalizedVariant = normalizeVariant(variant || type);
   const statusLabel =
@@ -288,17 +267,6 @@ LoadingSkeleton.propTypes = {
   compact: PropTypes.bool,
   label: PropTypes.string,
   className: PropTypes.string,
-};
-
-LoadingSkeleton.defaultProps = {
-  variant: 'page',
-  type: '',
-  rows: 5,
-  count: undefined,
-  cardCount: 3,
-  compact: false,
-  label: '',
-  className: '',
 };
 
 export {

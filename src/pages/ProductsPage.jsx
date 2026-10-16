@@ -5,7 +5,6 @@ import { ROUTES } from '../config/constants.js';
 import { productService } from '../domain/productService.js';
 import { useAppContext } from '../state/AppProvider.jsx';
 import { EmptyState } from '../components/shared/EmptyState.jsx';
-import { StatusBadge } from '../components/shared/StatusBadge.jsx';
 import { safeDisplay } from '../utils/formatters.js';
 
 const CATEGORY_ORDER = Object.freeze([
@@ -133,7 +132,7 @@ function getProductIcon(product, category) {
   return CATEGORY_STYLES[category]?.icon || '+';
 }
 
-function ProductCard({ product, onLearnMore, compact }) {
+function ProductCard({ product, onLearnMore, compact = false }) {
   const category = getProductCategory(product);
   const categoryStyle = CATEGORY_STYLES[category] || CATEGORY_STYLES['Other products'];
   const productValue = getProductValue(product);
@@ -208,11 +207,6 @@ ProductCard.propTypes = {
   compact: PropTypes.bool,
 };
 
-ProductCard.defaultProps = {
-  onLearnMore: undefined,
-  compact: false,
-};
-
 /**
  * Renders the categorized Nova Bank Demo product catalogue.
  *
@@ -229,10 +223,10 @@ ProductCard.defaultProps = {
 function ProductsPage({
   products: providedProducts,
   recommendations: providedRecommendations,
-  category: providedCategory,
+  category: providedCategory = 'All',
   onLearnMore,
   onProductSelect,
-  className,
+  className = '',
 }) {
   const navigate = useNavigate();
   const { persona } = useAppContext();
@@ -325,6 +319,9 @@ function ProductsPage({
           <h1 className="mt-2 text-3xl font-bold text-nova-midnight sm:text-4xl">
             Find what fits your goals
           </h1>
+          <p className="mt-2 max-w-2xl text-sm font-semibold text-nova-navy">
+            You are exploring the catalogue as a Prospective Product Customer.
+          </p>
           <p className="mt-2 max-w-2xl text-base text-nova-slate">
             Explore synthetic savings, cards, loans, and insurance products
             designed for this demonstration.
@@ -333,7 +330,7 @@ function ProductsPage({
 
         <NavLink
           to={ROUTES.dashboard}
-          className="hidden min-h-11 shrink-0 items-center rounded-lg border border-nova-navy px-4 py-2 text-sm font-semibold text-nova-navy transition hover:bg-nova-sky focus:outline-none focus:ring-4 focus:ring-nova-blue/20 sm:inline-flex"
+          className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-nova-navy px-4 py-2 text-sm font-semibold text-nova-navy transition hover:bg-nova-sky focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
         >
           Back to dashboard
         </NavLink>
@@ -365,7 +362,7 @@ function ProductsPage({
             </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {recommendations.slice(0, 3).map((product) => (
               <ProductCard
                 key={`recommended-${product.id}`}
@@ -392,7 +389,7 @@ function ProductsPage({
             </p>
           </div>
 
-          <div className="w-full sm:w-56">
+          <div className="w-full sm:w-64">
             <label
               htmlFor="products-category"
               className="mb-1.5 block text-sm font-semibold text-nova-midnight"
@@ -403,7 +400,7 @@ function ProductsPage({
               id="products-category"
               value={categories.includes(selectedCategory) ? selectedCategory : 'All'}
               onChange={handleCategoryChange}
-              className="min-h-11 w-full rounded-lg border border-nova-slate/30 bg-white px-3 py-2 text-sm text-nova-ink transition focus:border-nova-blue focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
+              className="min-h-11 w-full rounded-lg border border-[#E9E9E9] bg-white px-3 py-2 text-sm text-nova-ink transition focus:border-nova-navy focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
             >
               {categories.map((category) => (
                 <option key={category} value={category}>
@@ -452,7 +449,7 @@ function ProductsPage({
                     </div>
                   </div>
 
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {categoryProducts.map((product) => (
                       <ProductCard
                         key={product.id}
@@ -487,10 +484,6 @@ function ProductsPage({
         )}
       </section>
 
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-nova-sky/60 px-4 py-3 text-sm text-nova-slate">
-        <p>Product availability and terms are simulated for demonstration purposes.</p>
-        <StatusBadge status="simulated" />
-      </div>
     </div>
   );
 }
@@ -502,15 +495,6 @@ ProductsPage.propTypes = {
   onLearnMore: PropTypes.func,
   onProductSelect: PropTypes.func,
   className: PropTypes.string,
-};
-
-ProductsPage.defaultProps = {
-  products: undefined,
-  recommendations: undefined,
-  category: 'All',
-  onLearnMore: undefined,
-  onProductSelect: undefined,
-  className: '',
 };
 
 export { ProductsPage };

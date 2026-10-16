@@ -4,8 +4,6 @@ import { NavLink } from 'react-router-dom';
 import { ROUTES } from '../config/constants.js';
 import supportService from '../services/supportService.js';
 import { EmptyState } from '../components/shared/EmptyState.jsx';
-import { PrivacyBanner } from '../components/shared/PrivacyBanner.jsx';
-
 const TOPIC_OPTIONS = Object.freeze([
   { value: 'accounts', label: 'Accounts' },
   { value: 'transfers', label: 'Transfers' },
@@ -61,13 +59,13 @@ function getValidationErrors(values) {
  * @returns {JSX.Element}
  */
 function ContactPage({
-  topic: providedTopic,
-  subject: providedSubject,
-  message: providedMessage,
-  name,
-  email,
+  topic: providedTopic = '',
+  subject: providedSubject = '',
+  message: providedMessage = '',
+  name = '',
+  email = '',
   onSubmit,
-  className,
+  className = '',
 }) {
   const [topic, setTopic] = useState(normalizeText(providedTopic).toLowerCase());
   const [subject, setSubject] = useState(normalizeText(providedSubject));
@@ -183,7 +181,7 @@ function ContactPage({
 
         <NavLink
           to={ROUTES.help}
-          className="hidden min-h-11 shrink-0 items-center rounded-lg border border-nova-navy px-4 py-2 text-sm font-semibold text-nova-navy transition hover:bg-nova-sky focus:outline-none focus:ring-4 focus:ring-nova-blue/20 sm:inline-flex"
+          className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-nova-navy px-4 py-2 text-sm font-semibold text-nova-navy transition hover:bg-nova-sky focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
         >
           Back to help
         </NavLink>
@@ -213,6 +211,9 @@ function ContactPage({
           </p>
           <p className="mt-5 rounded-lg bg-nova-sky/60 px-4 py-3 font-semibold text-nova-midnight">
             Confirmation #{confirmation.reference}
+          </p>
+          <p className="mt-3 text-sm font-semibold text-nova-midnight">
+            Message received. Reference #{confirmation.reference}.
           </p>
           <p className="mt-4 text-sm text-nova-slate">
             No real bank or support team receives this message.
@@ -248,6 +249,12 @@ function ContactPage({
               >
                 {submitError}
               </p>
+            )}
+
+            {Object.keys(errors).length > 0 && (
+              <div role="alert" className="sr-only">
+                Review the highlighted fields before sending the message.
+              </div>
             )}
 
             <form className="mt-6" onSubmit={handleSubmit} noValidate>
@@ -356,7 +363,7 @@ function ContactPage({
                 disabled={isSubmitting}
                 className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-nova-navy px-5 py-3 font-semibold text-white transition hover:bg-nova-midnight focus:outline-none focus:ring-4 focus:ring-nova-blue/30 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isSubmitting ? 'Sending enquiry…' : 'Send enquiry'}
+                {isSubmitting ? 'Sending enquiry…' : 'Send Message (Simulated)'}
               </button>
             </form>
           </section>
@@ -403,7 +410,6 @@ function ContactPage({
         </div>
       )}
 
-      <PrivacyBanner compact className="mt-8" />
     </div>
   );
 }
@@ -416,16 +422,6 @@ ContactPage.propTypes = {
   email: PropTypes.string,
   onSubmit: PropTypes.func,
   className: PropTypes.string,
-};
-
-ContactPage.defaultProps = {
-  topic: '',
-  subject: '',
-  message: '',
-  name: '',
-  email: '',
-  onSubmit: undefined,
-  className: '',
 };
 
 export { ContactPage };

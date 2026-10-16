@@ -36,7 +36,7 @@ function hasValidSession(isAuthenticated, isExpired) {
  * }} props
  * @returns {JSX.Element}
  */
-function ProtectedRoute({ children, element, redirectTo }) {
+function ProtectedRoute({ children, element, redirectTo = ROUTES.login }) {
   const location = useLocation();
   const { isAuthenticated, isExpired } = useSession();
 
@@ -59,12 +59,6 @@ ProtectedRoute.propTypes = {
   children: PropTypes.node,
   element: PropTypes.node,
   redirectTo: PropTypes.string,
-};
-
-ProtectedRoute.defaultProps = {
-  children: undefined,
-  element: undefined,
-  redirectTo: ROUTES.login,
 };
 
 export { ProtectedRoute };

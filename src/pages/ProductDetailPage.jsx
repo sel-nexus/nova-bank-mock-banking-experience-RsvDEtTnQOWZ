@@ -90,11 +90,11 @@ function getProductId(productId, routeProductId) {
  * @returns {JSX.Element}
  */
 function ProductDetailPage({
-  productId: providedProductId,
+  productId: providedProductId = '',
   product: providedProduct,
   onContact,
   onAction,
-  className,
+  className = '',
 }) {
   const navigate = useNavigate();
   const { productId: routeProductId } = useParams();
@@ -244,7 +244,7 @@ function ProductDetailPage({
 
       <section
         aria-labelledby="product-overview-title"
-        className="mb-8 overflow-hidden rounded-card bg-nova-midnight p-6 text-white shadow-elevated sm:p-8"
+        className="mb-8 overflow-hidden rounded-card bg-nova-navy p-6 text-white shadow-elevated sm:p-8"
       >
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-start gap-4">
@@ -255,7 +255,7 @@ function ProductDetailPage({
               {getProductIcon(product)}
             </span>
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.14em] text-nova-lime">
+              <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#FEF4C8]">
                 Product overview
               </p>
               <h2
@@ -274,7 +274,7 @@ function ProductDetailPage({
           )}
         </div>
 
-        <p className="mt-6 max-w-3xl text-base leading-7 text-nova-sky">
+        <p className="mt-6 max-w-3xl text-base leading-7 text-white/90">
           {safeDisplay(
             product.description,
             'Explore this synthetic Nova Bank product to learn more.',
@@ -379,20 +379,6 @@ function ProductDetailPage({
               Ask about this product
             </button>
           </section>
-
-          <section
-            aria-label="Synthetic data disclaimer"
-            className="rounded-lg bg-nova-sky/70 px-4 py-4 text-sm text-nova-slate"
-          >
-            <p className="font-semibold text-nova-midnight">
-              Synthetic product information
-            </p>
-            <p className="mt-2 leading-6">
-              Product descriptions, benefits, availability, and eligibility are
-              simulated for demonstration purposes. No real application is
-              submitted and no financial account is opened.
-            </p>
-          </section>
         </aside>
       </div>
     </div>
@@ -405,14 +391,6 @@ ProductDetailPage.propTypes = {
   onContact: PropTypes.func,
   onAction: PropTypes.func,
   className: PropTypes.string,
-};
-
-ProductDetailPage.defaultProps = {
-  productId: '',
-  product: undefined,
-  onContact: undefined,
-  onAction: undefined,
-  className: '',
 };
 
 export { ProductDetailPage };

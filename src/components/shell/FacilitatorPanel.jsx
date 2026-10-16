@@ -36,11 +36,11 @@ function getActionError(result, fallbackMessage) {
  * @returns {JSX.Element}
  */
 function FacilitatorPanel({
-  title,
-  description,
-  className,
-  compact,
-  showDescription,
+  title = 'Facilitator controls',
+  description = 'Configure the synthetic demonstration.',
+  className = '',
+  compact = false,
+  showDescription = true,
   onPersonaChange,
   onErrorModeChange,
   onTimeout,
@@ -258,18 +258,6 @@ FacilitatorPanel.propTypes = {
   onErrorModeChange: PropTypes.func,
   onTimeout: PropTypes.func,
   onReset: PropTypes.func,
-};
-
-FacilitatorPanel.defaultProps = {
-  title: 'Facilitator controls',
-  description: 'Configure the synthetic demonstration.',
-  className: '',
-  compact: false,
-  showDescription: true,
-  onPersonaChange: undefined,
-  onErrorModeChange: undefined,
-  onTimeout: undefined,
-  onReset: undefined,
 };
 
 export { FacilitatorPanel };

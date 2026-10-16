@@ -109,22 +109,22 @@ function getValidity(offer, providedValidFrom, providedValidUntil) {
 function OfferDetailView({
   offer,
   offerData,
-  category,
+  category = '',
   benefits,
   eligible,
   isEligible,
-  validFrom,
-  validUntil,
+  validFrom = '',
+  validUntil = '',
   terms,
   onExpressInterest,
   onInterest,
   onApply,
   onLearnMore,
-  interestLabel,
-  applyLabel,
-  learnMoreLabel,
-  className,
-  compact,
+  interestLabel = 'Express interest',
+  applyLabel = 'Express interest',
+  learnMoreLabel = 'Learn more',
+  className = '',
+  compact = false,
 }) {
   const titleId = useId();
   const benefitsId = useId();
@@ -343,12 +343,6 @@ function OfferDetailView({
           )}
         </aside>
       </div>
-
-      <p className="mt-6 rounded-lg bg-nova-sky/70 px-4 py-3 text-sm leading-6 text-nova-slate">
-        This offer, its value, eligibility, terms, and availability are
-        simulated for demonstration purposes. No real account is opened, no
-        financial action is taken, and no application is submitted.
-      </p>
     </section>
   );
 }
@@ -380,27 +374,6 @@ OfferDetailView.propTypes = {
   learnMoreLabel: PropTypes.string,
   className: PropTypes.string,
   compact: PropTypes.bool,
-};
-
-OfferDetailView.defaultProps = {
-  offer: undefined,
-  offerData: undefined,
-  category: '',
-  benefits: undefined,
-  eligible: undefined,
-  isEligible: undefined,
-  validFrom: '',
-  validUntil: '',
-  terms: undefined,
-  onExpressInterest: undefined,
-  onInterest: undefined,
-  onApply: undefined,
-  onLearnMore: undefined,
-  interestLabel: 'Express interest',
-  applyLabel: 'Express interest',
-  learnMoreLabel: 'Learn more',
-  className: '',
-  compact: false,
 };
 
 export { OfferDetailView };

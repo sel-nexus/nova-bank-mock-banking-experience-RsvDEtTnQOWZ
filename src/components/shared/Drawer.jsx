@@ -7,6 +7,8 @@ import React, {
 import PropTypes from 'prop-types';
 import { createPortal } from 'react-dom';
 
+const noop = () => {};
+
 const FOCUSABLE_SELECTOR = [
   'a[href]',
   'area[href]',
@@ -97,24 +99,24 @@ function normalizePlacement(value) {
  * @returns {JSX.Element|null}
  */
 function Drawer({
-  open,
-  isOpen,
-  onClose,
+  open = false,
+  isOpen = false,
+  onClose = noop,
   title,
-  titleId: providedTitleId,
-  children,
-  closeLabel,
-  showCloseButton,
-  closeOnBackdrop,
-  closeOnEscape,
-  initialFocusRef,
-  placement,
-  side,
-  className,
-  contentClassName,
+  titleId: providedTitleId = '',
+  children = null,
+  closeLabel = 'Close drawer',
+  showCloseButton = true,
+  closeOnBackdrop = true,
+  closeOnEscape = true,
+  initialFocusRef = null,
+  placement = 'right',
+  side = '',
+  className = '',
+  contentClassName = '',
   labelledBy,
   describedBy,
-  ariaLabel,
+  ariaLabel = 'Drawer',
 }) {
   const drawerRef = useRef(null);
   const previouslyFocusedElementRef = useRef(null);
@@ -371,27 +373,6 @@ Drawer.propTypes = {
   labelledBy: PropTypes.string,
   describedBy: PropTypes.string,
   ariaLabel: PropTypes.string,
-};
-
-Drawer.defaultProps = {
-  open: false,
-  isOpen: false,
-  onClose: () => {},
-  title: undefined,
-  titleId: '',
-  children: null,
-  closeLabel: 'Close drawer',
-  showCloseButton: true,
-  closeOnBackdrop: true,
-  closeOnEscape: true,
-  initialFocusRef: null,
-  placement: 'right',
-  side: '',
-  className: '',
-  contentClassName: '',
-  labelledBy: undefined,
-  describedBy: undefined,
-  ariaLabel: 'Drawer',
 };
 
 export { Drawer };

@@ -5,30 +5,16 @@ import { ROUTES } from '../../config/constants.js';
 import { useGlobalSearch } from '../../hooks/useGlobalSearch.js';
 import { useSession } from '../../hooks/useSession.js';
 import { useAppContext } from '../../state/AppProvider.jsx';
+import { ProfileMenu } from './ProfileMenu.jsx';
 
 const NAVIGATION_ITEMS = Object.freeze([
-  { label: 'Dashboard', route: ROUTES.dashboard },
+  { label: 'Home', route: ROUTES.dashboard },
   { label: 'Accounts', route: ROUTES.accounts },
-  { label: 'Transfers', route: ROUTES.transfers },
-  { label: 'Payments', route: ROUTES.payments },
-  { label: 'Transactions', route: ROUTES.transactions },
+  { label: 'Products', route: '/products' },
+  { label: 'Promotions & Offers', route: '/offers' },
+  { label: 'Help & Support', route: '/support' },
+  { label: 'Contact', route: '/contact' },
 ]);
-
-function getInitials(persona, fallbackName = '') {
-  const name =
-    persona?.name ||
-    fallbackName ||
-    `${persona?.firstName || ''} ${persona?.lastName || ''}`.trim();
-
-  const initials = name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join('');
-
-  return initials || 'NB';
-}
 
 function getDisplayName(persona, fallbackName = '') {
   return (
@@ -44,13 +30,13 @@ function getResultRoute(result) {
 }
 
 function Header({
-  notificationCount,
+  notificationCount = 0,
   unreadNotificationCount,
-  userName,
+  userName = '',
   onLogout,
   onOpenChat,
   onNotifications,
-  className,
+  className = '',
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -67,7 +53,6 @@ function Header({
         : 0;
 
   const displayName = getDisplayName(persona, userName);
-  const initials = getInitials(persona, userName);
   const search = useGlobalSearch({
     personaId: persona?.id,
   });
@@ -137,48 +122,52 @@ function Header({
   return (
     <header
       className={[
-        'sticky top-0 z-40 border-b border-nova-slate/20 bg-white/95 shadow-sm backdrop-blur',
+        'sticky top-0 z-40 border-b border-[#E9E9E9] bg-white shadow-sm',
         className,
       ]
         .filter(Boolean)
         .join(' ')}
     >
-      <div className="mx-auto flex min-h-20 w-full max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+      <div aria-hidden="true" className="h-1 bg-nova-navy" />
+      <div className="header-bar mx-auto w-full max-w-[1280px] px-4 py-3 sm:px-6 lg:px-8">
         <NavLink
           to={ROUTES.dashboard}
           aria-label="Nova Bank dashboard"
-          className="flex shrink-0 items-center gap-2 text-nova-midnight transition hover:text-nova-blue focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
+          className="header-logo flex shrink-0 items-center gap-2 text-nova-navy transition hover:text-nova-blue focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
         >
           <span
             aria-hidden="true"
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-nova-midnight text-lg font-extrabold text-nova-lime"
+            className="flex h-10 w-10 items-center justify-center rounded-lg bg-nova-navy text-lg font-extrabold text-[#DCB91C]"
           >
             N
           </span>
-          <span className="hidden text-sm font-extrabold tracking-[0.16em] sm:inline">
+          <span className="hidden shrink-0 whitespace-nowrap pr-[0.2em] text-sm font-extrabold tracking-[0.14em] min-[420px]:inline sm:tracking-[0.16em]">
             NOVA BANK
           </span>
         </NavLink>
 
         <nav
           aria-label="Primary navigation"
-          className="hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex"
+          className="header-nav"
         >
           {NAVIGATION_ITEMS.map((item) => {
             const isActive =
               location.pathname === item.route ||
+              (item.route !== ROUTES.dashboard &&
+                item.route !== '/' &&
+                location.pathname.startsWith(`${item.route}/`)) ||
               (item.route === ROUTES.accounts &&
-                location.pathname.startsWith('/accounts/'));
+                location.pathname.startsWith('/accounts'));
 
             return (
               <NavLink
                 key={item.route}
                 to={item.route}
                 className={[
-                  'rounded-lg px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-nova-blue/20',
+                  'whitespace-nowrap rounded-md px-2 py-2 text-xs font-semibold transition focus:outline-none focus:ring-4 focus:ring-nova-blue/20 sm:px-3 sm:text-sm',
                   isActive
-                    ? 'bg-nova-sky text-nova-midnight'
-                    : 'text-nova-slate hover:bg-nova-sky/70 hover:text-nova-midnight',
+                    ? 'bg-nova-sky text-nova-navy shadow-[inset_0_-2px_0_0_#B11116]'
+                    : 'text-nova-slate hover:bg-nova-sky hover:text-nova-navy',
                 ].join(' ')}
               >
                 {item.label}
@@ -187,7 +176,7 @@ function Header({
           })}
         </nav>
 
-        <div ref={searchRef} className="relative hidden w-full max-w-xs xl:block">
+        <div ref={searchRef} className="header-search relative">
           <form
             aria-label="Global search"
             onSubmit={handleSearchSubmit}
@@ -215,7 +204,7 @@ function Header({
           </form>
 
           {isSearchOpen && search.query.trim() && (
-            <div className="absolute right-0 top-full mt-2 w-full min-w-80 overflow-hidden rounded-card border border-nova-slate/20 bg-white shadow-elevated">
+            <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-card border border-[#E9E9E9] bg-white shadow-elevated sm:left-auto sm:right-0 sm:w-80">
               {search.hasResults ? (
                 <ul
                   aria-label="Search results"
@@ -247,17 +236,17 @@ function Header({
           )}
         </div>
 
-        <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+        <div className="header-actions flex shrink-0 items-center gap-1 sm:gap-2">
           <button
             type="button"
             onClick={handleChatClick}
             aria-label="Open support chat"
-            className="hidden h-11 items-center gap-2 rounded-lg px-3 text-sm font-semibold text-nova-navy transition hover:bg-nova-sky focus:outline-none focus:ring-4 focus:ring-nova-blue/20 md:inline-flex"
+            className="inline-flex h-11 items-center gap-2 rounded-lg bg-nova-navy px-3 text-sm font-semibold text-white transition hover:bg-nova-blue focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
           >
             <span aria-hidden="true" className="text-lg">
               ◌
             </span>
-            <span>Chat</span>
+            <span className="hidden sm:inline">Chat</span>
           </button>
 
           <button
@@ -274,60 +263,20 @@ function Header({
             {activeNotificationCount > 0 && (
               <span
                 aria-hidden="true"
-                className="absolute right-1 top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-nova-coral px-1 text-[10px] font-bold text-nova-midnight"
+                className="absolute right-1 top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-nova-navy px-1 text-[10px] font-bold text-white"
               >
                 {activeNotificationCount > 99 ? '99+' : activeNotificationCount}
               </span>
             )}
           </button>
 
-          <NavLink
-            to={ROUTES.profile}
-            aria-label={`Open profile for ${displayName}`}
-            className="flex items-center gap-2 rounded-lg p-1.5 transition hover:bg-nova-sky focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
-          >
-            <span
-              aria-hidden="true"
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-nova-navy text-xs font-bold text-white"
-            >
-              {initials}
-            </span>
-            <span className="hidden max-w-28 truncate text-sm font-semibold text-nova-midnight xl:block">
-              {displayName}
-            </span>
-          </NavLink>
-
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="hidden min-h-11 rounded-lg px-3 text-sm font-semibold text-nova-slate transition hover:bg-nova-coral/10 hover:text-nova-midnight focus:outline-none focus:ring-4 focus:ring-nova-blue/20 sm:inline-flex sm:items-center"
-          >
-            Log out
-          </button>
+          <ProfileMenu
+            persona={persona}
+            userName={displayName}
+            onLogout={handleLogout}
+          />
         </div>
       </div>
-
-      <nav
-        aria-label="Mobile primary navigation"
-        className="flex gap-1 overflow-x-auto border-t border-nova-slate/10 px-4 py-2 lg:hidden sm:px-6"
-      >
-        {NAVIGATION_ITEMS.map((item) => (
-          <NavLink
-            key={`mobile-${item.route}`}
-            to={item.route}
-            className={({ isActive }) =>
-              [
-                'whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold transition focus:outline-none focus:ring-4 focus:ring-nova-blue/20',
-                isActive
-                  ? 'bg-nova-sky text-nova-midnight'
-                  : 'text-nova-slate hover:bg-nova-sky/70 hover:text-nova-midnight',
-              ].join(' ')
-            }
-          >
-            {item.label}
-          </NavLink>
-        ))}
-      </nav>
     </header>
   );
 }
@@ -340,16 +289,6 @@ Header.propTypes = {
   onOpenChat: PropTypes.func,
   onNotifications: PropTypes.func,
   className: PropTypes.string,
-};
-
-Header.defaultProps = {
-  notificationCount: 0,
-  unreadNotificationCount: undefined,
-  userName: '',
-  onLogout: undefined,
-  onOpenChat: undefined,
-  onNotifications: undefined,
-  className: '',
 };
 
 export { Header };

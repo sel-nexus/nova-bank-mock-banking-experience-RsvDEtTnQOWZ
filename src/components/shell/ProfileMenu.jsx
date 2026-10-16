@@ -5,7 +5,7 @@ import { ROUTES } from '../../config/constants.js';
 import { useSession } from '../../hooks/useSession.js';
 import { maskIdentifier } from '../../utils/formatters.js';
 import { useAppContext } from '../../state/AppProvider.jsx';
-import { useFacilitator } from '../../state/FacilitatorContext.jsx';
+import { useOptionalFacilitator } from '../../state/FacilitatorContext.jsx';
 
 function isObject(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -77,8 +77,8 @@ function getPersonaIdentifier(persona) {
  */
 function ProfileMenu({
   persona: providedPersona,
-  personaId,
-  userName,
+  personaId = '',
+  userName = '',
   personas: providedPersonas,
   open,
   isOpen,
@@ -87,9 +87,9 @@ function ProfileMenu({
   onSwitchPersona,
   onReset,
   onLogout,
-  showFacilitator,
-  showPersonaSwitcher,
-  className,
+  showFacilitator = true,
+  showPersonaSwitcher = true,
+  className = '',
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -100,7 +100,7 @@ function ProfileMenu({
   const {
     logout,
   } = useSession();
-  const facilitator = useFacilitator();
+  const facilitator = useOptionalFacilitator();
 
   const selectedPersona =
     providedPersona ||
@@ -111,7 +111,7 @@ function ProfileMenu({
   const initials = getInitials(selectedPersona, userName);
   const personas = Array.isArray(providedPersonas)
     ? providedPersonas
-    : Array.isArray(facilitator.personas)
+    : Array.isArray(facilitator?.personas)
       ? facilitator.personas
       : [];
   const isControlled = open !== undefined || isOpen !== undefined;
@@ -119,8 +119,8 @@ function ProfileMenu({
     ? open === true || isOpen === true
     : localOpen;
   const shouldShowFacilitator =
-    showFacilitator && facilitator.isOpen !== undefined;
-  const errorMode = facilitator.errorMode || 'disabled';
+    showFacilitator && facilitator?.isOpen !== undefined;
+  const errorMode = facilitator?.errorMode || 'disabled';
 
   useEffect(() => {
     const handleDocumentMouseDown = (event) => {
@@ -162,7 +162,7 @@ function ProfileMenu({
 
     if (typeof handler === 'function') {
       handler(nextPersonaId);
-    } else if (typeof facilitator.switchPersona === 'function') {
+    } else if (typeof facilitator?.switchPersona === 'function') {
       facilitator.switchPersona(nextPersonaId);
     }
   };
@@ -181,7 +181,7 @@ function ProfileMenu({
     const result =
       typeof onReset === 'function'
         ? onReset()
-        : facilitator.resetDemonstration();
+        : facilitator?.resetDemonstration?.();
 
     if (result?.success !== false) {
       setMenuVisibility(false);
@@ -189,11 +189,11 @@ function ProfileMenu({
   };
 
   const handleErrorModeChange = (event) => {
-    facilitator.setErrorMode(event.target.value);
+    facilitator?.setErrorMode?.(event.target.value);
   };
 
   const handleTimeout = () => {
-    facilitator.triggerInstantTimeout();
+    facilitator?.triggerInstantTimeout?.();
     setMenuVisibility(false);
   };
 
@@ -256,8 +256,11 @@ function ProfileMenu({
                 <p className="truncate font-bold text-nova-midnight">
                   {displayName}
                 </p>
+                <p className="mt-0.5 text-xs font-semibold text-nova-navy">
+                  {selectedPersona?.role || 'Retail Banking Customer'}
+                </p>
                 <p className="mt-0.5 text-xs text-nova-slate">
-                  User ID: {maskIdentifier(activePersonaId)}
+                  User ID: {selectedPersona?.username || maskIdentifier(activePersonaId)}
                 </p>
               </div>
             </div>
@@ -297,7 +300,7 @@ function ProfileMenu({
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-bold text-nova-midnight">
-                      Facilitator controls
+                      Demonstration Facilitator
                     </p>
                     <p className="mt-1 text-xs text-nova-slate">
                       Configure the synthetic demonstration.
@@ -400,23 +403,6 @@ ProfileMenu.propTypes = {
   showFacilitator: PropTypes.bool,
   showPersonaSwitcher: PropTypes.bool,
   className: PropTypes.string,
-};
-
-ProfileMenu.defaultProps = {
-  persona: undefined,
-  personaId: '',
-  userName: '',
-  personas: undefined,
-  open: undefined,
-  isOpen: undefined,
-  onOpenChange: undefined,
-  onPersonaChange: undefined,
-  onSwitchPersona: undefined,
-  onReset: undefined,
-  onLogout: undefined,
-  showFacilitator: true,
-  showPersonaSwitcher: true,
-  className: '',
 };
 
 export { ProfileMenu };

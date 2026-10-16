@@ -93,7 +93,7 @@ function getOfferAccent(offer) {
   return CATEGORY_STYLES[getOfferCategory(offer)]?.accent || 'bg-nova-sky text-nova-blue';
 }
 
-function OfferCard({ offer, featured, onSelect, onInterest }) {
+function OfferCard({ offer, featured = false, onSelect, onInterest }) {
   const offerValue = getOfferValue(offer);
 
   return (
@@ -131,9 +131,16 @@ function OfferCard({ offer, featured, onSelect, onInterest }) {
       </div>
 
       <div className="mt-5">
-        <p className="text-xs font-bold uppercase tracking-wide text-nova-blue">
-          {safeDisplay(offer.category, 'Offer')}
-        </p>
+        <div className="flex flex-wrap gap-2">
+          <p className="text-xs font-bold uppercase tracking-wide text-nova-blue">
+            {safeDisplay(offer.category, 'Offer')}
+          </p>
+          {offer.personalizationLabel && (
+            <p className="text-xs font-bold text-nova-navy">
+              {offer.personalizationLabel}
+            </p>
+          )}
+        </div>
         <h3 className="mt-1 text-xl font-bold text-nova-midnight">
           {safeDisplay(offer.title, 'Nova Bank offer')}
         </h3>
@@ -147,7 +154,7 @@ function OfferCard({ offer, featured, onSelect, onInterest }) {
 
       <div className="mt-auto pt-6">
         <p className="text-xs text-nova-slate">
-          Available through {offer.validUntil ? formatDate(offer.validUntil) : 'the current demo period'}
+          Valid until {offer.validUntil ? formatDate(offer.validUntil) : '31 Dec 2026'}
         </p>
 
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
@@ -163,7 +170,7 @@ function OfferCard({ offer, featured, onSelect, onInterest }) {
             onClick={() => onInterest?.(offer)}
             className="min-h-11 flex-1 rounded-lg bg-nova-navy px-4 py-2 text-sm font-semibold text-white transition hover:bg-nova-midnight focus:outline-none focus:ring-4 focus:ring-nova-blue/30"
           >
-            I'm interested
+            Express Interest
           </button>
         </div>
       </div>
@@ -176,12 +183,6 @@ OfferCard.propTypes = {
   featured: PropTypes.bool,
   onSelect: PropTypes.func,
   onInterest: PropTypes.func,
-};
-
-OfferCard.defaultProps = {
-  featured: false,
-  onSelect: undefined,
-  onInterest: undefined,
 };
 
 /**
@@ -199,13 +200,13 @@ OfferCard.defaultProps = {
  * @returns {JSX.Element}
  */
 function OffersPage({
-  personaId: providedPersonaId,
+  personaId: providedPersonaId = '',
   offers: providedOffers,
   featuredOffers: providedFeaturedOffers,
-  category: providedCategory,
+  category: providedCategory = 'all',
   onOfferSelect,
   onInterest,
-  className,
+  className = '',
 }) {
   const { persona, session } = useAppContext();
   const [selectedCategory, setSelectedCategory] = useState(
@@ -295,7 +296,7 @@ function OffersPage({
       }
 
       setInterestMessage(
-        'Your interest was recorded locally. No application or real account action was started.',
+        'Interest recorded for this demonstration. No credit check or real application was submitted.',
       );
       setSelectedOffer(offer);
     } catch {
@@ -317,15 +318,13 @@ function OffersPage({
               Offers for you
             </p>
             <h1 className="mt-2 text-3xl font-bold text-nova-midnight sm:text-4xl">
-              Make more of your banking
+              Promotions and Offers
             </h1>
             <p className="mt-2 max-w-2xl text-base text-nova-slate">
               Explore current synthetic offers selected for your Nova Bank Demo
               experience.
             </p>
           </div>
-
-          <StatusBadge status="simulated" label="Demo offers" />
         </header>
 
         {loadError && (
@@ -337,37 +336,28 @@ function OffersPage({
           </section>
         )}
 
-        {featuredOffers.length > 0 && (
+        {featuredOffers[0] && (
           <section
-            aria-labelledby="featured-offers-title"
-            className="mb-10"
+            aria-labelledby="featured-campaign-title"
+            className="mb-8 rounded-card bg-nova-navy px-6 py-8 text-white sm:px-8"
           >
-            <div className="mb-4">
-              <p className="text-sm font-semibold uppercase tracking-[0.14em] text-nova-teal">
-                Personalized highlights
-              </p>
-              <h2
-                id="featured-offers-title"
-                className="mt-1 text-2xl font-bold text-nova-midnight"
-              >
-                Featured offers
-              </h2>
-              <p className="mt-1 text-sm text-nova-slate">
-                A few active offers to explore first.
-              </p>
-            </div>
-
-            <div className="grid gap-4 lg:grid-cols-2">
-              {featuredOffers.map((offer) => (
-                <OfferCard
-                  key={`featured-${offer.id}`}
-                  offer={offer}
-                  featured
-                  onSelect={handleSelect}
-                  onInterest={handleInterest}
-                />
-              ))}
-            </div>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#FEF4C8]">
+              Featured Promotion
+            </p>
+            <h2 id="featured-campaign-title" className="mt-3 max-w-3xl text-2xl font-bold sm:text-3xl">
+              {featuredOffers[0].title}: {featuredOffers[0].description}
+            </h2>
+            <p className="mt-3 text-sm text-white/85">
+              Valid through {featuredOffers[0].validUntil ? formatDate(featuredOffers[0].validUntil) : '31 Dec 2026'}
+              {featuredOffers[0].eligibility ? ` • ${featuredOffers[0].eligibility}.` : '.'}
+            </p>
+            <button
+              type="button"
+              onClick={() => handleSelect(featuredOffers[0])}
+              className="mt-6 min-h-11 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-nova-navy transition hover:bg-[#FEF4C8] focus:outline-none focus:ring-4 focus:ring-white/40"
+            >
+              View Offer Details
+            </button>
           </section>
         )}
 
@@ -385,7 +375,7 @@ function OffersPage({
               </p>
             </div>
 
-            <div className="w-full sm:w-56">
+            <div className="w-full sm:w-64">
               <label
                 htmlFor="offers-category"
                 className="mb-1.5 block text-sm font-semibold text-nova-midnight"
@@ -400,7 +390,7 @@ function OffersPage({
                   ? selectedCategory
                   : 'all'}
                 onChange={handleCategoryChange}
-                className="min-h-11 w-full rounded-lg border border-nova-slate/30 bg-white px-3 py-2 text-sm text-nova-ink transition focus:border-nova-blue focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
+                className="min-h-11 w-full rounded-lg border border-[#E9E9E9] bg-white px-3 py-2 text-sm text-nova-ink transition focus:border-nova-navy focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
               >
                 {CATEGORY_ORDER.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -412,7 +402,7 @@ function OffersPage({
           </div>
 
           {filteredOffers.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
               {filteredOffers.map((offer) => (
                 <OfferCard
                   key={offer.id}
@@ -447,12 +437,6 @@ function OffersPage({
           )}
         </section>
 
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-nova-sky/60 px-4 py-3 text-sm text-nova-slate">
-          <p>Offer availability and terms are simulated for demonstration purposes.</p>
-          <p className="text-xs">
-            No application or real financial action is submitted.
-          </p>
-        </div>
       </div>
 
       <Modal
@@ -522,7 +506,7 @@ function OffersPage({
               onClick={() => handleInterest(selectedOffer)}
               className="mt-6 min-h-11 w-full rounded-lg bg-nova-navy px-4 py-2 text-sm font-semibold text-white transition hover:bg-nova-midnight focus:outline-none focus:ring-4 focus:ring-nova-blue/30"
             >
-              I'm interested
+              Express Interest (Simulated)
             </button>
           </div>
         )}
@@ -539,16 +523,6 @@ OffersPage.propTypes = {
   onOfferSelect: PropTypes.func,
   onInterest: PropTypes.func,
   className: PropTypes.string,
-};
-
-OffersPage.defaultProps = {
-  personaId: '',
-  offers: undefined,
-  featuredOffers: undefined,
-  category: 'all',
-  onOfferSelect: undefined,
-  onInterest: undefined,
-  className: '',
 };
 
 export { OffersPage };

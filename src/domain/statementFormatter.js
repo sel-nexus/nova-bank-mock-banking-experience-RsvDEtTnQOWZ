@@ -8,7 +8,7 @@ import {
 } from '../utils/formatters.js';
 
 const DEFAULT_TITLE = 'Nova Bank Demo Statement';
-const DEFAULT_CURRENCY = 'USD';
+const DEFAULT_CURRENCY = 'PHP';
 
 function isObject(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);

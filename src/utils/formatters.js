@@ -43,8 +43,21 @@ export function formatCurrency(
     return DISPLAY_PLACEHOLDER;
   }
 
+  if (String(currency).toUpperCase() === 'PHP') {
+    try {
+      const formattedAmount = new Intl.NumberFormat('en-PH', {
+        minimumFractionDigits: CURRENCY.decimals,
+        maximumFractionDigits: CURRENCY.decimals,
+      }).format(numericAmount);
+
+      return `PHP ${formattedAmount}`;
+    } catch {
+      return DISPLAY_PLACEHOLDER;
+    }
+  }
+
   try {
-    return new Intl.NumberFormat(locale, {
+    return new Intl.NumberFormat(currency === 'USD' ? 'en-US' : locale, {
       style: 'currency',
       currency,
       minimumFractionDigits: CURRENCY.decimals,

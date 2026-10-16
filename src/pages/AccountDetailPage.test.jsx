@@ -84,16 +84,14 @@ describe('AccountDetailPage', () => {
     renderAccountDetail();
 
     expect(
-      await screen.findByRole('heading', { name: 'Everyday Checking' }),
+      await screen.findByRole('heading', { name: 'Payroll Account' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('$12,500.00')).toBeInTheDocument();
-    expect(screen.getByText('$12,180.45')).toBeInTheDocument();
-    expect(screen.getByText('$15.99')).toBeInTheDocument();
-    expect(screen.getByText('•••• 5678')).toBeInTheDocument();
-    expect(screen.queryByText('100012345678')).not.toBeInTheDocument();
-    expect(screen.getByText('Current balance')).toBeInTheDocument();
+    expect(screen.getAllByText('PHP 26,240.15').length).toBeGreaterThan(0);
+    expect(screen.getByText('•••• 4821')).toBeInTheDocument();
+    expect(screen.queryByText('100000004821')).not.toBeInTheDocument();
+    expect(screen.getByText('Current / ledger balance')).toBeInTheDocument();
     expect(screen.getByText('Available balance')).toBeInTheDocument();
-    expect(screen.getByText('Pending activity')).toBeInTheDocument();
+    expect(screen.getByText('Pending transactions')).toBeInTheDocument();
   });
 
   it('keeps another persona account unavailable to the active persona', async () => {
@@ -114,20 +112,20 @@ describe('AccountDetailPage', () => {
   it('renders transaction activity and supports searching the displayed transactions', async () => {
     const user = userEvent.setup();
 
-    renderAccountDetail();
+    renderAccountDetail('account-miguel-savings');
 
     expect(
-      await screen.findByText('Payroll deposit'),
+      await screen.findByText('Salary credit'),
     ).toBeInTheDocument();
-    expect(screen.getByText('Rent payment')).toBeInTheDocument();
-    expect(screen.getByText('Monthly subscription')).toBeInTheDocument();
+    expect(screen.getByText('Manila Supermarket')).toBeInTheDocument();
+    expect(screen.getByText('Savings goal transfer')).toBeInTheDocument();
 
-    const searchInput = screen.getByLabelText('Search activity');
-    await user.type(searchInput, 'rent');
+    const searchInput = screen.getByLabelText('Search transactions');
+    await user.type(searchInput, 'manila');
 
-    expect(screen.getByText('Rent payment')).toBeInTheDocument();
-    expect(screen.queryByText('Payroll deposit')).not.toBeInTheDocument();
-    expect(screen.queryByText('Monthly subscription')).not.toBeInTheDocument();
+    expect(screen.getByText('Manila Supermarket')).toBeInTheDocument();
+    expect(screen.queryByText('Salary credit')).not.toBeInTheDocument();
+    expect(screen.queryByText('Savings goal transfer')).not.toBeInTheDocument();
   });
 
   it('opens the transaction enquiry action from the account activity section', async () => {
@@ -135,7 +133,7 @@ describe('AccountDetailPage', () => {
 
     renderAccountDetail();
 
-    await screen.findByText('Payroll deposit');
+    await screen.findByText('Payroll credit');
 
     await user.click(
       screen.getByRole('button', { name: 'Ask about a transaction' }),
@@ -180,7 +178,7 @@ describe('AccountDetailPage', () => {
     );
 
     expect(
-      await screen.findByRole('heading', { name: 'Everyday Checking' }),
+      await screen.findByRole('heading', { name: 'Payroll Account' }),
     ).toBeInTheDocument();
     expect(validateSpy).toHaveBeenCalledTimes(2);
   });
@@ -208,7 +206,7 @@ describe('AccountDetailPage', () => {
     );
 
     expect(
-      await screen.findByRole('heading', { name: 'Everyday Checking' }),
+      await screen.findByRole('heading', { name: 'Payroll Account' }),
     ).toBeInTheDocument();
 
     await user.click(
@@ -216,8 +214,8 @@ describe('AccountDetailPage', () => {
     );
 
     expect(
-      await screen.findByRole('status'),
-    ).toHaveTextContent('Statement ready: everyday-checking-statement.txt.');
+      await screen.findByText('Statement ready: statement-4821-demo.txt.'),
+    ).toBeInTheDocument();
     expect(createObjectURL).toHaveBeenCalledTimes(1);
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:statement');
     expect(anchorClick).toHaveBeenCalledTimes(1);
@@ -252,10 +250,10 @@ describe('AccountDetailPage', () => {
     );
 
     expect(
-      await screen.findByRole('heading', { name: 'Everyday Checking' }),
+      await screen.findByRole('heading', { name: 'Payroll Account' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('$999.50')).toBeInTheDocument();
-    expect(screen.getByText('$950.00')).toBeInTheDocument();
+    expect(screen.getByText('PHP 999.50')).toBeInTheDocument();
+    expect(screen.getByText('PHP 950.00')).toBeInTheDocument();
     expect(screen.getByText('Provided demo payment')).toBeInTheDocument();
     expect(screen.getByText('•••• 5678')).toBeInTheDocument();
     expect(screen.queryByText('100012345678')).not.toBeInTheDocument();

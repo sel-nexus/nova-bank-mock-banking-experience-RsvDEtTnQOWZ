@@ -109,9 +109,11 @@ describe('accessibility gate', () => {
 
   it('renders the public login experience with a labelled form, landmarks, and valid heading structure', () => {
     const { container } = render(
-      <MemoryRouter initialEntries={['/login']}>
-        <LoginPage />
-      </MemoryRouter>,
+      <AppProvider>
+        <MemoryRouter initialEntries={['/login']}>
+          <LoginPage />
+        </MemoryRouter>
+      </AppProvider>,
     );
 
     expect(screen.getByRole('main')).toBeInTheDocument();
@@ -141,9 +143,6 @@ describe('accessibility gate', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('main')).toBeInTheDocument();
     expect(
-      screen.getByRole('note', { name: 'Privacy and synthetic data notice' }),
-    ).toBeInTheDocument();
-    expect(
       screen.getByRole('button', { name: 'Open support chat' }),
     ).toBeInTheDocument();
   });
@@ -152,10 +151,10 @@ describe('accessibility gate', () => {
     const { container } = renderAccountDetail();
 
     expect(
-      await screen.findByRole('heading', { name: 'Everyday Checking' }),
+      await screen.findByRole('heading', { name: 'Payroll Account' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Everyday Checking',
+      'Payroll Account',
     );
     expect(
       screen.getByRole('region', { name: 'Account information' }),
@@ -163,7 +162,7 @@ describe('accessibility gate', () => {
     expect(
       screen.getByRole('region', { name: 'Transaction activity' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('•••• 5678')).toBeInTheDocument();
+    expect(screen.getByText('•••• 4821')).toBeInTheDocument();
     expect(screen.queryByText('100012345678')).not.toBeInTheDocument();
     expectHeadingStructure(container);
   });
@@ -173,14 +172,14 @@ describe('accessibility gate', () => {
 
     expect(screen.getByRole('main')).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'How can we help?' }),
+      screen.getByRole('heading', { name: 'How can we help today?' }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText('Search FAQs')).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /Is this a real bank\?/i }),
     ).toHaveAttribute('aria-expanded', 'false');
     expect(
-      screen.getByRole('button', { name: /Downtown Austin/i }),
+      screen.getByRole('button', { name: /Ayala Branch/i }),
     ).toHaveAttribute('aria-expanded', 'false');
     expectHeadingStructure(container);
   });

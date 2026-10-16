@@ -6,7 +6,7 @@ import {
   DEFAULT_FIXTURE_USER_ID,
 } from '../fixtures/fixtures.js';
 import { accountService } from '../domain/accountService.js';
-import { transactionService } from '../services/transactionService.js';
+import { transactionService } from '../domain/transactionService.js';
 import { downloadStatement } from '../services/statementDownload.js';
 import { useDomainData } from '../hooks/useDomainData.js';
 import { useAppContext } from '../state/AppProvider.jsx';
@@ -22,6 +22,10 @@ import {
   safeDisplay,
 } from '../utils/formatters.js';
 import { selectAndSortTransactions } from '../domain/transactionSelectors.js';
+import {
+  differenceInDays,
+  getReferenceDateString,
+} from '../domain/referenceClock.js';
 
 function getPersonaId(persona, session, providedPersonaId) {
   return (
@@ -39,16 +43,6 @@ function getAccountId(accountId) {
   }
 
   return accountId.trim();
-}
-
-function getAccountBalance(account) {
-  return Number.isFinite(account?.balance) ? account.balance : 0;
-}
-
-function getAvailableBalance(account) {
-  return Number.isFinite(account?.availableBalance)
-    ? account.availableBalance
-    : getAccountBalance(account);
 }
 
 function getAccountTypeLabel(type) {
@@ -92,6 +86,123 @@ function getTransactionDescription(transaction) {
   );
 }
 
+function getTransactionIsoDate(transaction) {
+  const value = transaction?.date || getTransactionDate(transaction);
+  return typeof value === 'string' ? value.slice(0, 10) : '';
+}
+
+function isWithinDateRange(transaction, dateRange, customStart, customEnd) {
+  const isoDate = getTransactionIsoDate(transaction);
+
+  if (!isoDate) {
+    return false;
+  }
+
+  if (dateRange === 'custom') {
+    if (customStart && isoDate < customStart) {
+      return false;
+    }
+
+    if (customEnd && isoDate > customEnd) {
+      return false;
+    }
+
+    return true;
+  }
+
+  const days = Number(dateRange);
+  const age = differenceInDays(isoDate, getReferenceDateString());
+
+  return age !== null && age >= 0 && age <= days;
+}
+
+function getBalanceMetrics(account) {
+  const currency = account.currency;
+
+  if (account.type === 'credit') {
+    return [
+      {
+        label: 'Amount due',
+        value: formatCurrency(account.amountDue ?? account.balance, currency),
+      },
+      {
+        label: 'Credit limit',
+        value: formatCurrency(account.creditLimit, currency),
+      },
+      {
+        label: 'Available credit',
+        value: formatCurrency(
+          account.availableCredit ?? account.availableBalance,
+          currency,
+        ),
+      },
+      {
+        label: 'Currency',
+        value: currency || 'PHP',
+      },
+    ];
+  }
+
+  if (account.type === 'loan') {
+    return [
+      {
+        label: 'Outstanding principal',
+        value: formatCurrency(
+          account.outstandingPrincipal ?? account.balance,
+          currency,
+        ),
+      },
+      {
+        label: 'Account status',
+        value: 'Active',
+      },
+      {
+        label: 'Currency',
+        value: currency || 'PHP',
+      },
+      {
+        label: 'Account type',
+        value: 'Loan',
+      },
+    ];
+  }
+
+  return [
+    {
+      label: 'Available balance',
+      value: formatCurrency(
+        account.availableBalance ?? account.balance,
+        currency,
+      ),
+    },
+    {
+      label: 'Current / ledger balance',
+      value: formatCurrency(account.balance, currency),
+    },
+    {
+      label: 'Pending transactions',
+      value: formatCurrency(account.pendingAmount ?? 0, currency),
+    },
+    {
+      label: 'Annual interest rate',
+      value:
+        typeof account.interestRate === 'number'
+          ? `${account.interestRate.toFixed(2)}% p.a.`
+          : 'Not applicable',
+    },
+  ];
+}
+
+const TRANSACTION_CATEGORIES = [
+  'All categories',
+  'Income',
+  'Groceries',
+  'Savings',
+  'Dining',
+  'Transport',
+  'Uncategorized',
+];
+
 /**
  * Renders account details, balances, metadata, statement actions, and
  * persona-scoped transaction activity.
@@ -106,16 +217,22 @@ function getTransactionDescription(transaction) {
  * @returns {JSX.Element}
  */
 function AccountDetailPage({
-  accountId: providedAccountId,
-  personaId: providedPersonaId,
+  accountId: providedAccountId = '',
+  personaId: providedPersonaId = '',
   account: providedAccount,
   transactions: providedTransactions,
-  className,
+  className = '',
 }) {
   const { accountId: routeAccountId } = useParams();
   const { persona, session, actions } = useAppContext();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [dateRange, setDateRange] = useState('30');
+  const [customStart, setCustomStart] = useState('');
+  const [customEnd, setCustomEnd] = useState('');
+  const [directionFilter, setDirectionFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('All categories');
+  const [expandedTransactionId, setExpandedTransactionId] = useState('');
   const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
   const [enquiryMessage, setEnquiryMessage] = useState('');
   const [enquiryError, setEnquiryError] = useState('');
@@ -212,8 +329,26 @@ function AccountDetailPage({
         );
       const matchesStatus =
         !statusFilter || transaction.status === statusFilter;
+      const matchesDirection =
+        directionFilter === 'all' || transaction.direction === directionFilter;
+      const matchesCategory =
+        categoryFilter === 'All categories' ||
+        String(transaction.category || '').toLowerCase() ===
+          categoryFilter.toLowerCase();
+      const matchesDate = isWithinDateRange(
+        transaction,
+        dateRange,
+        customStart,
+        customEnd,
+      );
 
-      return matchesSearch && matchesStatus;
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesDirection &&
+        matchesCategory &&
+        matchesDate
+      );
     });
 
     return selectAndSortTransactions(filtered, {
@@ -221,25 +356,16 @@ function AccountDetailPage({
       sortOrder: 'desc',
       includeFuture: true,
     });
-  }, [search, statusFilter, transactions]);
-
-  const balanceSummary = useMemo(() => {
-    const balance = getAccountBalance(account);
-    const availableBalance = getAvailableBalance(account);
-
-    return {
-      balance,
-      availableBalance,
-      pendingAmount: transactions
-        .filter((transaction) => transaction.status === 'pending')
-        .reduce(
-          (total, transaction) =>
-            total + (Number.isFinite(transaction.amount) ? transaction.amount : 0),
-          0,
-        ),
-      transactionCount: transactions.length,
-    };
-  }, [account, transactions]);
+  }, [
+    categoryFilter,
+    customEnd,
+    customStart,
+    dateRange,
+    directionFilter,
+    search,
+    statusFilter,
+    transactions,
+  ]);
 
   const handleStatementDownload = () => {
     if (!account) {
@@ -257,7 +383,9 @@ function AccountDetailPage({
           transactions,
         },
         {
-          filename: `${account.name || 'nova-bank-account'}-statement`,
+          filename: `statement-${String(
+            account.maskedAccountNumber || account.accountNumber || 'demo',
+          ).slice(-4)}-demo`,
         },
       );
 
@@ -355,6 +483,40 @@ function AccountDetailPage({
     );
   }
 
+  if (!hasProvidedAccount && accountData.isError) {
+    return (
+      <div
+        className={['page-container', className].filter(Boolean).join(' ')}
+        data-testid="account-detail-page"
+      >
+        <div className="mb-6">
+          <NavLink
+            to={ROUTES.accounts}
+            className="text-sm font-semibold text-nova-blue underline-offset-2 hover:text-nova-midnight hover:underline focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
+          >
+            ← Back to accounts
+          </NavLink>
+        </div>
+        <section role="alert" className="surface-card px-6 py-10">
+          <h1 className="text-2xl font-bold text-nova-midnight">
+            Accounts could not be loaded
+          </h1>
+          <p className="mt-3 text-sm text-nova-slate">
+            {accountData.error?.message ||
+              'Unable to retrieve latest account information.'}
+          </p>
+          <button
+            type="button"
+            onClick={() => accountData.retry()}
+            className="mt-6 min-h-11 rounded-lg bg-nova-navy px-4 py-2 text-sm font-semibold text-white"
+          >
+            Try again
+          </button>
+        </section>
+      </div>
+    );
+  }
+
   if (!account) {
     const reason =
       accountResult?.reason ||
@@ -418,11 +580,28 @@ function AccountDetailPage({
               <StatusBadge status={account.status} />
             </div>
             <p className="mt-2 text-base text-nova-slate">
-              {safeDisplay(
-                account.maskedAccountNumber,
-                'Account number unavailable',
-              )}
+              <span>
+                {safeDisplay(
+                  account.maskedAccountNumber,
+                  'Account number unavailable',
+                )}
+              </span>
+              {account.currency ? <span>{` · ${account.currency}`}</span> : null}
             </p>
+            {(account.interestRate || account.lastStatementDate) && (
+              <p className="mt-2 text-sm text-nova-slate">
+                {typeof account.interestRate === 'number'
+                  ? `Interest rate: ${account.interestRate.toFixed(2)}% p.a.`
+                  : ''}
+                {typeof account.interestRate === 'number' &&
+                account.lastStatementDate
+                  ? ' | '
+                  : ''}
+                {account.lastStatementDate
+                  ? `Last statement date: ${formatDate(account.lastStatementDate)}`
+                  : ''}
+              </p>
+            )}
           </div>
 
           <button
@@ -444,52 +623,6 @@ function AccountDetailPage({
         )}
 
         <section
-          aria-labelledby="balance-overview-title"
-          className="mb-8 rounded-card bg-nova-midnight p-6 text-white shadow-elevated sm:p-8"
-        >
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.14em] text-nova-lime">
-                Current balance
-              </p>
-              <h2
-                id="balance-overview-title"
-                className="mt-3 text-4xl font-bold sm:text-5xl"
-              >
-                {formatCurrency(account.balance, account.currency)}
-              </h2>
-              <p className="mt-3 text-sm text-nova-sky">
-                Available to spend:{' '}
-                <span className="font-semibold text-white">
-                  {formatCurrency(
-                    balanceSummary.availableBalance,
-                    account.currency,
-                  )}
-                </span>
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 text-sm sm:min-w-64">
-              <div className="rounded-lg bg-white/10 p-4">
-                <p className="text-nova-sky">Pending activity</p>
-                <p className="mt-1 text-xl font-bold text-white">
-                  {formatCurrency(
-                    balanceSummary.pendingAmount,
-                    account.currency,
-                  )}
-                </p>
-              </div>
-              <div className="rounded-lg bg-white/10 p-4">
-                <p className="text-nova-sky">Transactions</p>
-                <p className="mt-1 text-xl font-bold text-white">
-                  {balanceSummary.transactionCount}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section
           aria-labelledby="account-information-title"
           className="mb-8"
         >
@@ -500,73 +633,17 @@ function AccountDetailPage({
             Account information
           </h2>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="surface-card p-5">
-              <p className="text-sm font-semibold text-nova-slate">
-                Account type
-              </p>
-              <p className="mt-2 font-bold text-nova-midnight">
-                {getAccountTypeLabel(account.type)}
-              </p>
-            </div>
-
-            <div className="surface-card p-5">
-              <p className="text-sm font-semibold text-nova-slate">
-                Account number
-              </p>
-              <p className="mt-2 font-bold text-nova-midnight">
-                {safeDisplay(account.maskedAccountNumber)}
-              </p>
-            </div>
-
-            <div className="surface-card p-5">
-              <p className="text-sm font-semibold text-nova-slate">
-                Routing number
-              </p>
-              <p className="mt-2 font-bold text-nova-midnight">
-                {safeDisplay(account.routingNumber)}
-              </p>
-            </div>
-
-            <div className="surface-card p-5">
-              <p className="text-sm font-semibold text-nova-slate">
-                Opened
-              </p>
-              <p className="mt-2 font-bold text-nova-midnight">
-                {account.openedAt ? formatDate(account.openedAt) : 'Not available'}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <div className="surface-card p-5">
-              <p className="text-sm font-semibold text-nova-slate">
-                Available balance
-              </p>
-              <p className="mt-2 text-2xl font-bold text-nova-midnight">
-                {formatCurrency(
-                  balanceSummary.availableBalance,
-                  account.currency,
-                )}
-              </p>
-              <p className="mt-1 text-sm text-nova-slate">
-                Funds available for eligible activity.
-              </p>
-            </div>
-
-            <div className="surface-card p-5">
-              <p className="text-sm font-semibold text-nova-slate">
-                Last updated
-              </p>
-              <p className="mt-2 text-lg font-bold text-nova-midnight">
-                {account.lastUpdated
-                  ? formatDateTime(account.lastUpdated)
-                  : 'Not available'}
-              </p>
-              <p className="mt-1 text-sm text-nova-slate">
-                All account information is synthetic demo data.
-              </p>
-            </div>
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {getBalanceMetrics(account).map((metric) => (
+              <div key={metric.label} className="surface-card p-5">
+                <p className="text-sm font-semibold text-nova-slate">
+                  {metric.label}
+                </p>
+                <p className="mt-2 text-xl font-bold text-nova-midnight sm:text-2xl">
+                  {metric.value}
+                </p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -593,44 +670,143 @@ function AccountDetailPage({
             </button>
           </div>
 
-          <div className="surface-card mb-4 grid gap-4 p-4 sm:grid-cols-[minmax(0,1fr)_12rem]">
-            <div>
+          <div className="surface-card mb-4 flex flex-wrap items-end gap-4 p-4">
+            <div className="min-w-[16rem] flex-1">
               <label
                 htmlFor="account-transaction-search"
                 className="mb-1.5 block text-sm font-semibold text-nova-midnight"
               >
-                Search activity
+                Search transactions
               </label>
               <input
                 id="account-transaction-search"
                 type="search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search description, category, or reference"
+                placeholder="Search merchant name or reference"
                 className="min-h-11 w-full rounded-lg border border-nova-slate/30 bg-white px-3 py-2 text-sm text-nova-ink transition focus:border-nova-blue focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
               />
             </div>
 
-            <div>
+            <div className="min-w-[12rem]">
               <label
-                htmlFor="account-transaction-status"
+                htmlFor="account-transaction-range"
                 className="mb-1.5 block text-sm font-semibold text-nova-midnight"
               >
-                Status
+                Date range
               </label>
               <select
-                id="account-transaction-status"
-                value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value)}
+                id="account-transaction-range"
+                value={dateRange}
+                onChange={(event) => setDateRange(event.target.value)}
                 className="min-h-11 w-full rounded-lg border border-nova-slate/30 bg-white px-3 py-2 text-sm text-nova-ink transition focus:border-nova-blue focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
               >
-                <option value="">All statuses</option>
-                <option value="completed">Posted</option>
-                <option value="pending">Pending</option>
-                <option value="failed">Failed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+                <option value="90">Last 90 days</option>
+                <option value="custom">Custom range</option>
               </select>
             </div>
+
+            <div>
+              <p className="mb-1.5 text-sm font-semibold text-nova-midnight">
+                Type
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  ['all', 'All'],
+                  ['credit', 'Money in'],
+                  ['debit', 'Money out'],
+                ].map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={directionFilter === value}
+                    onClick={() => setDirectionFilter(value)}
+                    className={[
+                      'min-h-11 rounded-full px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-nova-blue/20',
+                      directionFilter === value
+                        ? 'bg-nova-navy text-white'
+                        : 'border border-nova-slate/30 text-nova-midnight hover:bg-nova-sky',
+                    ].join(' ')}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="min-w-[12rem]">
+              <label
+                htmlFor="account-transaction-category"
+                className="mb-1.5 block text-sm font-semibold text-nova-midnight"
+              >
+                Category
+              </label>
+              <select
+                id="account-transaction-category"
+                value={categoryFilter}
+                onChange={(event) => setCategoryFilter(event.target.value)}
+                className="min-h-11 w-full rounded-lg border border-nova-slate/30 bg-white px-3 py-2 text-sm text-nova-ink transition focus:border-nova-blue focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
+              >
+                {TRANSACTION_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setSearch('');
+                setStatusFilter('');
+                setDateRange('30');
+                setCustomStart('');
+                setCustomEnd('');
+                setDirectionFilter('all');
+                setCategoryFilter('All categories');
+              }}
+              className="min-h-11 rounded-lg border border-nova-navy px-4 py-2 text-sm font-semibold text-nova-navy transition hover:bg-nova-sky focus:outline-none focus:ring-4 focus:ring-nova-blue/20"
+            >
+              Reset filters
+            </button>
+
+            {dateRange === 'custom' && (
+              <div className="flex flex-wrap gap-3">
+                <div>
+                  <label
+                    htmlFor="account-transaction-start"
+                    className="mb-1.5 block text-sm font-semibold text-nova-midnight"
+                  >
+                    From
+                  </label>
+                  <input
+                    id="account-transaction-start"
+                    type="date"
+                    value={customStart}
+                    onChange={(event) => setCustomStart(event.target.value)}
+                    className="min-h-11 rounded-lg border border-nova-slate/30 px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="account-transaction-end"
+                    className="mb-1.5 block text-sm font-semibold text-nova-midnight"
+                  >
+                    To
+                  </label>
+                  <input
+                    id="account-transaction-end"
+                    type="date"
+                    value={customEnd}
+                    onChange={(event) => setCustomEnd(event.target.value)}
+                    className="min-h-11 rounded-lg border border-nova-slate/30 px-3 py-2 text-sm"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {!hasProvidedTransactions && transactionData.isLoading && (
@@ -640,77 +816,95 @@ function AccountDetailPage({
           {(!transactionData.isLoading || hasProvidedTransactions) &&
             (filteredTransactions.length > 0 ? (
               <div className="surface-card overflow-hidden">
-                <div className="hidden grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_auto_auto] gap-4 border-b border-nova-slate/20 bg-nova-sky/30 px-5 py-3 text-xs font-bold uppercase tracking-wide text-nova-slate sm:grid sm:px-6">
-                  <span>Description</span>
+                <div className="hidden grid-cols-[8rem_minmax(0,1.4fr)_8rem_7rem_auto] gap-4 border-b border-nova-slate/20 bg-nova-sky/30 px-5 py-3 text-xs font-bold uppercase tracking-wide text-nova-slate sm:grid sm:px-6">
                   <span>Date</span>
+                  <span>Description</span>
+                  <span>Category</span>
                   <span>Status</span>
                   <span className="text-right">Amount</span>
                 </div>
 
                 <div className="divide-y divide-nova-slate/15">
-                  {filteredTransactions.map((transaction) => (
-                    <article
-                      key={transaction.id}
-                      className="grid gap-3 px-5 py-4 sm:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_auto_auto] sm:items-center sm:gap-4 sm:px-6"
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate font-semibold text-nova-midnight">
-                          {getTransactionDescription(transaction)}
-                        </p>
-                        <p className="mt-1 text-sm text-nova-slate">
-                          {safeDisplay(
-                            transaction.category || transaction.type,
-                            'General activity',
-                          )}
-                          {transaction.reference
-                            ? ` · ${transaction.reference}`
-                            : ''}
-                        </p>
-                      </div>
+                  {filteredTransactions.map((transaction) => {
+                    const isExpanded = expandedTransactionId === transaction.id;
+                    const postedLabel = transaction.postedAt
+                      ? formatDateTime(transaction.postedAt)
+                      : '10:45 AM PHT';
 
-                      <p className="text-sm text-nova-slate">
-                        {getTransactionDate(transaction)
-                          ? formatDate(getTransactionDate(transaction))
-                          : 'Date unavailable'}
-                      </p>
-
-                      <StatusBadge status={transaction.status} />
-
-                      <p
-                        className={[
-                          'font-bold sm:text-right',
-                          transaction.direction === 'credit'
-                            ? 'text-nova-teal'
-                            : 'text-nova-midnight',
-                        ].join(' ')}
-                      >
-                        {formatTransactionAmount(
-                          transaction.amount,
-                          transaction.direction,
-                          transaction.currency || account.currency,
+                    return (
+                      <article key={transaction.id}>
+                        <button
+                          type="button"
+                          aria-expanded={isExpanded}
+                          onClick={() =>
+                            setExpandedTransactionId(
+                              isExpanded ? '' : transaction.id,
+                            )
+                          }
+                          className="grid w-full gap-3 px-5 py-4 text-left transition hover:bg-nova-sky/40 focus:outline-none focus:ring-4 focus:ring-inset focus:ring-nova-blue/20 sm:grid-cols-[8rem_minmax(0,1.4fr)_8rem_7rem_auto] sm:items-center sm:gap-4 sm:px-6"
+                        >
+                          <p className="text-sm text-nova-slate">
+                            {getTransactionIsoDate(transaction)
+                              ? formatDate(getTransactionIsoDate(transaction))
+                              : 'Date unavailable'}
+                          </p>
+                          <p className="truncate font-semibold text-nova-midnight">
+                            {getTransactionDescription(transaction)}
+                          </p>
+                          <p className="text-sm text-nova-slate">
+                            {safeDisplay(transaction.category, 'General')}
+                          </p>
+                          <StatusBadge status={transaction.status} />
+                          <p
+                            className={[
+                              'font-bold sm:text-right',
+                              transaction.direction === 'credit'
+                                ? 'text-nova-teal'
+                                : 'text-nova-midnight',
+                            ].join(' ')}
+                          >
+                            <span className="block">
+                              {transaction.status === 'failed' &&
+                              transaction.amount === 0
+                                ? formatCurrency(0, transaction.currency || account.currency)
+                                : formatTransactionAmount(
+                                    transaction.amount,
+                                    transaction.direction,
+                                    transaction.currency || account.currency,
+                                  )}
+                            </span>
+                            <span className="block text-xs font-semibold">
+                              {transaction.direction === 'credit'
+                                ? 'Money in'
+                                : 'Money out'}
+                            </span>
+                          </p>
+                        </button>
+                        {isExpanded && (
+                          <p className="bg-nova-cream/70 px-5 py-3 text-sm text-nova-ink sm:px-6">
+                            Synthetic Demonstration Transaction. Reference:{' '}
+                            {transaction.reference || 'Not available'}. Posted at{' '}
+                            {postedLabel}.
+                          </p>
                         )}
-                      </p>
-                    </article>
-                  ))}
+                      </article>
+                    );
+                  })}
                 </div>
               </div>
             ) : (
               <EmptyState
                 title="No matching transactions"
                 description={
-                  search || statusFilter
-                    ? 'Try changing your search or status filter.'
-                    : 'There is no activity to display for this account.'
+                  search || statusFilter || directionFilter !== 'all' || categoryFilter !== 'All categories'
+                    ? 'No transactions found in this period. Reset filters or broaden your search.'
+                    : 'No transactions found in this period. Reset filters or broaden your search.'
                 }
                 compact
               />
             ))}
         </section>
 
-        <p className="mt-8 rounded-lg bg-nova-sky/60 px-4 py-3 text-sm text-nova-slate">
-          Account details, balances, and transaction activity shown here are
-          synthetic demo data. Account identifiers are masked for privacy.
-        </p>
       </div>
 
       <Modal
@@ -794,14 +988,6 @@ AccountDetailPage.propTypes = {
   account: PropTypes.object,
   transactions: PropTypes.arrayOf(PropTypes.object),
   className: PropTypes.string,
-};
-
-AccountDetailPage.defaultProps = {
-  accountId: '',
-  personaId: '',
-  account: undefined,
-  transactions: undefined,
-  className: '',
 };
 
 export { AccountDetailPage };

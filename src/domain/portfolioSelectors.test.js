@@ -15,12 +15,13 @@ describe('portfolioSelectors', () => {
       (account) => account.userId === 'user-miguel-santos',
     );
 
-    expect(calculateRelationshipBalance(miguelAccounts)).toBe(40950);
-    expect(getRelationshipBalanceSummary(miguelAccounts)).toEqual({
-      balance: 40950,
-      accountCount: 2,
-      currency: 'USD',
-    });
+    expect(calculateRelationshipBalance(miguelAccounts)).toBeCloseTo(142860.25, 2);
+    expect(getRelationshipBalanceSummary(miguelAccounts).accountCount).toBe(2);
+    expect(getRelationshipBalanceSummary(miguelAccounts).currency).toBe('PHP');
+    expect(getRelationshipBalanceSummary(miguelAccounts).balance).toBeCloseTo(
+      142860.25,
+      2,
+    );
   });
 
   it('calculates Rosa Delacruz relationship balance from her eligible checking account', () => {
@@ -28,11 +29,11 @@ describe('portfolioSelectors', () => {
       (account) => account.userId === 'user-rosa-delacruz',
     );
 
-    expect(calculateRelationshipBalance(rosaAccounts)).toBe(8450.72);
+    expect(calculateRelationshipBalance(rosaAccounts)).toBe(54300);
     expect(getRelationshipBalanceSummary(rosaAccounts)).toEqual({
-      balance: 8450.72,
+      balance: 54300,
       accountCount: 1,
-      currency: 'USD',
+      currency: 'PHP',
     });
   });
 

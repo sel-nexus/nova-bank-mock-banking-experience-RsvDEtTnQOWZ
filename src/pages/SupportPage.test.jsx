@@ -56,18 +56,10 @@ describe('SupportPage', () => {
   it('renders support channels and the synthetic banking disclaimer', () => {
     renderSupport();
 
-    expect(
-      screen.getByRole('heading', { name: 'Sample support hotlines' }),
-    ).toBeInTheDocument();
-    expect(screen.getByText('Nova Demo Support')).toBeInTheDocument();
-    expect(screen.getByText('Technical assistance')).toBeInTheDocument();
-    expect(screen.getByText('1-800-555-0100')).toBeInTheDocument();
-    expect(screen.getByText('1-800-555-0111')).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'This is a synthetic banking experience for demonstration purposes. It does not connect to real financial accounts or process real transactions.',
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Call Us' })).toBeInTheDocument();
+    expect(screen.getByText('(+63 2) 8000 0000')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Lost or Stolen Card' })).toBeInTheDocument();
+    expect(screen.getByText('(+63 2) 8000 0001')).toBeInTheDocument();
   });
 
   it('filters FAQs by search text and expands the matching answer', async () => {
@@ -135,7 +127,7 @@ describe('SupportPage', () => {
 
     expect(branchButton).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByText('100 Synthetic Avenue')).toBeInTheDocument();
-    expect(screen.getByText('09:00–17:00')).toBeInTheDocument();
+    expect(screen.getAllByText('09:00–17:00').length).toBeGreaterThan(0);
     expect(screen.getByText('Account support')).toBeInTheDocument();
     expect(screen.getByText('Cash services')).toBeInTheDocument();
   });

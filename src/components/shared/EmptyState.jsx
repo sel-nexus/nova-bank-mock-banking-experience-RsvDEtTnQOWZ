@@ -2,19 +2,19 @@ import React, { useId } from 'react';
 import PropTypes from 'prop-types';
 
 function EmptyState({
-  title,
-  description,
-  message,
-  action,
-  actionLabel,
-  actionText,
+  title = 'Nothing here yet',
+  description = 'There are no results to display right now.',
+  message = '',
+  action = null,
+  actionLabel = '',
+  actionText = '',
   onAction,
   onRetry,
-  retryLabel,
-  icon,
+  retryLabel = 'Try again',
+  icon = '—',
   children,
-  className,
-  compact,
+  className = '',
+  compact = false,
 }) {
   const titleId = useId();
   const descriptionId = useId();
@@ -102,22 +102,6 @@ EmptyState.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
   compact: PropTypes.bool,
-};
-
-EmptyState.defaultProps = {
-  title: 'Nothing here yet',
-  description: 'There are no results to display right now.',
-  message: '',
-  action: null,
-  actionLabel: '',
-  actionText: '',
-  onAction: undefined,
-  onRetry: undefined,
-  retryLabel: 'Try again',
-  icon: '—',
-  children: undefined,
-  className: '',
-  compact: false,
 };
 
 export { EmptyState };

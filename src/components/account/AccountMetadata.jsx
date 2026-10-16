@@ -53,14 +53,14 @@ function formatMetadataDate(value) {
  * @returns {JSX.Element}
  */
 function AccountMetadata({
-  account,
-  title,
-  accountNumber,
-  maskedAccountNumber,
-  status,
-  currency,
-  lastStatementDate,
-  className,
+  account = {},
+  title = '',
+  accountNumber = '',
+  maskedAccountNumber = '',
+  status = '',
+  currency = '',
+  lastStatementDate = '',
+  className = '',
 }) {
   const titleId = useId();
   const accountData = account || {};
@@ -151,17 +151,6 @@ AccountMetadata.propTypes = {
     PropTypes.number,
   ]),
   className: PropTypes.string,
-};
-
-AccountMetadata.defaultProps = {
-  account: {},
-  title: '',
-  accountNumber: '',
-  maskedAccountNumber: '',
-  status: '',
-  currency: '',
-  lastStatementDate: '',
-  className: '',
 };
 
 export { AccountMetadata };

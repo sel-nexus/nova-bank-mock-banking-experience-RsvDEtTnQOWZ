@@ -101,15 +101,15 @@ function getEligibility(product, providedEligibility) {
 function ProductDetailView({
   product,
   productData,
-  category,
+  category = '',
   benefits,
   eligible,
   isEligible,
   onLearnMore,
   onLearnMoreClick,
-  learnMoreLabel,
-  className,
-  compact,
+  learnMoreLabel = 'Learn more',
+  className = '',
+  compact = false,
 }) {
   const catalogueProduct = product || productData || {};
   const productName = safeDisplay(
@@ -258,20 +258,6 @@ ProductDetailView.propTypes = {
   learnMoreLabel: PropTypes.string,
   className: PropTypes.string,
   compact: PropTypes.bool,
-};
-
-ProductDetailView.defaultProps = {
-  product: undefined,
-  productData: undefined,
-  category: '',
-  benefits: undefined,
-  eligible: undefined,
-  isEligible: undefined,
-  onLearnMore: undefined,
-  onLearnMoreClick: undefined,
-  learnMoreLabel: 'Learn more',
-  className: '',
-  compact: false,
 };
 
 export { ProductDetailView };

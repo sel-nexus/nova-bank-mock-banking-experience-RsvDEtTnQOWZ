@@ -42,21 +42,21 @@ function getFilename(options) {
  * @returns {JSX.Element}
  */
 function StatementDownloadButton({
-  statement,
+  statement = {},
   account,
   transactions,
   filteredTransactions,
   visibleRows,
   rows,
   filters,
-  filename,
-  fileName,
-  downloadName,
-  title,
-  label,
+  filename = '',
+  fileName = '',
+  downloadName = '',
+  title = '',
+  label = 'Download statement',
   children,
-  disabled,
-  className,
+  disabled = false,
+  className = '',
   onDownload,
   onSuccess,
   onError,
@@ -194,27 +194,6 @@ StatementDownloadButton.propTypes = {
   onDownload: PropTypes.func,
   onSuccess: PropTypes.func,
   onError: PropTypes.func,
-};
-
-StatementDownloadButton.defaultProps = {
-  statement: {},
-  account: undefined,
-  transactions: undefined,
-  filteredTransactions: undefined,
-  visibleRows: undefined,
-  rows: undefined,
-  filters: undefined,
-  filename: '',
-  fileName: '',
-  downloadName: '',
-  title: '',
-  label: 'Download statement',
-  children: undefined,
-  disabled: false,
-  className: '',
-  onDownload: undefined,
-  onSuccess: undefined,
-  onError: undefined,
 };
 
 export { StatementDownloadButton };
