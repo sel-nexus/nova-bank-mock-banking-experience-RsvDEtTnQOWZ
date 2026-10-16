@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Nova Bank</title>
+  <defs>
+    <linearGradient id="crimson" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9E1B32"/>
+      <stop offset="1" stop-color="#5E1022"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="18" y1="14" x2="48" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE08A"/>
+      <stop offset="1" stop-color="#C9952E"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#3B0B18"/>
+  <rect x="4" y="4" width="56" height="56" rx="13" fill="url(#crimson)"/>
+  <path d="M16 45V19h7.5l17 16.8V19H48v26h-7.4L23.5 28.1V45H16Z" fill="url(#gold)"/>
+  <path d="m32 9 1.8 5.2L39 16l-5.2 1.8L32 23l-1.8-5.2L25 16l5.2-1.8L32 9Z" fill="#FFF0AE"/>
+</svg>
