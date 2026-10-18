@@ -559,5 +559,3 @@ This project is intended for controlled demonstration environments. It must not 
 ## License
 
 This project is private and proprietary. All rights reserved.
-
-Permission to use, copy, modify, distribute, or deploy this project is limited to explicitly authorized parties and purposes. No license is granted for commercial use, redistribution, sublicensing, or public release without written authorization from the project owner.
